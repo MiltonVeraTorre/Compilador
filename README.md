@@ -46,7 +46,6 @@ end
   - `parser/` - Analizador sintáctico
     - `parser.ts` - Implementación del analizador sintáctico
     - `grammar.ts` - Definición de la gramática BabyDuck
-    - `ast.ts` - Definiciones para el Árbol de Sintaxis Abstracta
   - `index.ts` - Punto de entrada principal que integra lexer y parser
   - `index.test.ts` - Pruebas para el analizador
   - `example.ts` - Ejemplo de uso del compilador
