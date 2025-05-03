@@ -1,12 +1,23 @@
 import { babyDuckLexer } from './lexer/lexer';
 import { babyDuckParser } from './parser/parser';
+import { SemanticError } from './semantic/semantic-analyzer';
+
+/**
+ * Interfaz para el resultado del análisis
+ */
+export interface AnalysisResult {
+  cst: any;
+  lexErrors: any[];
+  parseErrors: any[];
+  semanticErrors: SemanticError[];
+}
 
 /**
  * Analiza el código fuente de BabyDuck
  * @param sourceCode El código fuente a analizar
  * @returns El resultado del análisis con CST y cualquier error
  */
-export function parseInput(sourceCode: string) {
+export function parseInput(sourceCode: string): AnalysisResult {
   // Tokenizar la entrada
   const lexResult = babyDuckLexer.tokenize(sourceCode);
 
@@ -16,7 +27,8 @@ export function parseInput(sourceCode: string) {
     return {
       cst: null,
       lexErrors: lexResult.errors,
-      parseErrors: []
+      parseErrors: [],
+      semanticErrors: []
     };
   }
 
@@ -31,7 +43,8 @@ export function parseInput(sourceCode: string) {
   return {
     cst: parseResult.cst,
     lexErrors: lexResult.errors,
-    parseErrors: parseResult.parseErrors
+    parseErrors: parseResult.parseErrors,
+    semanticErrors: parseResult.semanticErrors || []
   };
 }
 

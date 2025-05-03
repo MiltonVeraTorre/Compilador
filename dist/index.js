@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.babyDuckParser = exports.babyDuckLexer = void 0;
-exports.parseInput = parseInput;
+exports.babyDuckParser = exports.babyDuckLexer = exports.parseInput = void 0;
 const lexer_1 = require("./lexer/lexer");
 Object.defineProperty(exports, "babyDuckLexer", { enumerable: true, get: function () { return lexer_1.babyDuckLexer; } });
 const parser_1 = require("./parser/parser");
@@ -20,7 +19,8 @@ function parseInput(sourceCode) {
         return {
             cst: null,
             lexErrors: lexResult.errors,
-            parseErrors: []
+            parseErrors: [],
+            semanticErrors: []
         };
     }
     // Analizar los tokens
@@ -32,6 +32,8 @@ function parseInput(sourceCode) {
     return {
         cst: parseResult.cst,
         lexErrors: lexResult.errors,
-        parseErrors: parseResult.parseErrors
+        parseErrors: parseResult.parseErrors,
+        semanticErrors: parseResult.semanticErrors || []
     };
 }
+exports.parseInput = parseInput;
