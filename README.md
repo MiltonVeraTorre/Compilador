@@ -157,6 +157,13 @@ src/
     variable-table.ts       # Tabla de variables
     semantic-cube.ts        # Cubo semántico para validar tipos
     index.ts                # Exportaciones de componentes semánticos
+  quadruples/
+    stack.ts                # Implementación de pila genérica
+    queue.ts                # Implementación de fila genérica
+    quadruple.ts            # Definición de cuádruplos
+    quadruple-generator.ts  # Generador de cuádruplos
+    index.ts                # Exportaciones de componentes de cuádruplos
+    quadruple.test.ts       # Pruebas para cuádruplos
   index.ts         # Entrada principal del compilador
   index.test.ts    # Tests básicos con Jest
   semantic.test.ts # Tests semánticos
@@ -179,9 +186,11 @@ src/
    - Se comprueban parámetros en llamadas a funciones.
    - Se detectan errores como variables duplicadas.
 
-4. **Generación de código** (en desarrollo):
-   - Se asignan direcciones de memoria virtual.
-   - Se generará código intermedio para ejecución.
+4. **Generación de código intermedio**:
+   - Se utilizan pilas de operadores, operandos y tipos.
+   - Se generan cuádruplos para expresiones aritméticas y relacionales.
+   - Se generan cuádruplos para estatutos lineales (asignaciones, print).
+   - Se asignan direcciones de memoria virtual (en desarrollo).
 
 ## Cómo Ejecutar Tests
 
@@ -429,8 +438,72 @@ Al hacerlo todo en un mismo flujo, el compilador es más rápido y encuentra err
 - ✅ Cubo Semántico para validación de tipos
 - ✅ Directorio de Funciones y Tabla de Variables
 - ✅ Detección de errores léxicos, sintácticos y semánticos
+- ✅ Pilas de operadores, operandos y tipos
+- ✅ Fila de cuádruplos
+- ✅ Generación de cuádruplos para expresiones aritméticas y relacionales
+- ✅ Generación de cuádruplos para estatutos lineales
 
 ## En Desarrollo
 - 🔄 Asignación de memoria virtual
-- 🔄 Generación de código intermedio
+- 🔄 Generación de cuádruplos para estatutos no lineales (if, while)
+- 🔄 Generación de cuádruplos para funciones
+
+# Documentación de Estructuras para Generación de Código Intermedio
+
+## Pilas y Filas
+
+Para la generación de código intermedio, se implementaron las siguientes estructuras:
+
+### Pilas (Stacks)
+
+Se implementaron tres pilas principales:
+
+1. **Pila de Operadores**: Almacena los operadores durante el análisis de expresiones.
+2. **Pila de Operandos**: Almacena los operandos (variables, constantes, temporales).
+3. **Pila de Tipos**: Almacena los tipos de datos correspondientes a los operandos.
+
+Las pilas se implementaron como clases genéricas en TypeScript, lo que permite reutilizar la misma estructura para diferentes tipos de datos.
+
+### Fila (Queue)
+
+Se implementó una fila para almacenar los cuádruplos generados:
+
+1. **Fila de Cuádruplos**: Almacena los cuádruplos en el orden en que se generan.
+
+La fila también se implementó como una clase genérica en TypeScript.
+
+## Cuádruplos
+
+Los cuádruplos son la representación de código intermedio utilizada en el compilador. Cada cuádruplo tiene la siguiente estructura:
+
+```ts
+interface Quadruple {
+  operator: QuadrupleOperator | Operator;
+  leftOperand: string | number | null;
+  rightOperand: string | number | null;
+  result: string | number | null;
+}
+```
+
+Donde:
+- `operator`: Es el operador de la operación (aritméticos, relacionales, asignación, etc.)
+- `leftOperand`: Es el operando izquierdo (puede ser null en operaciones unarias)
+- `rightOperand`: Es el operando derecho (puede ser null en operaciones unarias)
+- `result`: Es donde se almacena el resultado de la operación
+
+## Puntos Neurálgicos
+
+Los puntos neurálgicos son los lugares en el análisis sintáctico donde se realizan acciones semánticas o de generación de código. Los principales puntos neurálgicos implementados son:
+
+1. **Procesamiento de Factores**: Cuando se encuentra una variable o constante, se agrega a la pila de operandos y tipos.
+2. **Procesamiento de Términos**: Cuando se encuentra un operador de multiplicación o división, se genera el cuádruplo correspondiente.
+3. **Procesamiento de Expresiones Aritméticas**: Cuando se encuentra un operador de suma o resta, se genera el cuádruplo correspondiente.
+4. **Procesamiento de Expresiones Relacionales**: Cuando se encuentra un operador relacional, se genera el cuádruplo correspondiente.
+5. **Procesamiento de Asignaciones**: Cuando se encuentra una asignación, se genera el cuádruplo correspondiente.
+
+Cada punto neurálgico realiza las siguientes acciones:
+1. Verificar la validez semántica (tipos compatibles)
+2. Generar variables temporales si es necesario
+3. Generar el cuádruplo correspondiente
+4. Actualizar las pilas de operandos y tipos
 

@@ -1,10 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.babyDuckParser = exports.babyDuckLexer = exports.parseInput = void 0;
+exports.babyDuckParser = exports.babyDuckLexer = void 0;
+exports.parseInput = parseInput;
 const lexer_1 = require("./lexer/lexer");
 Object.defineProperty(exports, "babyDuckLexer", { enumerable: true, get: function () { return lexer_1.babyDuckLexer; } });
 const parser_1 = require("./parser/parser");
 Object.defineProperty(exports, "babyDuckParser", { enumerable: true, get: function () { return parser_1.babyDuckParser; } });
+const semantic_analyzer_1 = require("./semantic/semantic-analyzer");
 /**
  * Analiza el código fuente de BabyDuck
  * @param sourceCode El código fuente a analizar
@@ -20,7 +22,8 @@ function parseInput(sourceCode) {
             cst: null,
             lexErrors: lexResult.errors,
             parseErrors: [],
-            semanticErrors: []
+            semanticErrors: [],
+            quadruples: []
         };
     }
     // Analizar los tokens
@@ -33,7 +36,7 @@ function parseInput(sourceCode) {
         cst: parseResult.cst,
         lexErrors: lexResult.errors,
         parseErrors: parseResult.parseErrors,
-        semanticErrors: parseResult.semanticErrors || []
+        semanticErrors: parseResult.semanticErrors || [],
+        quadruples: semantic_analyzer_1.semanticAnalyzer.getQuadruples() || []
     };
 }
-exports.parseInput = parseInput;

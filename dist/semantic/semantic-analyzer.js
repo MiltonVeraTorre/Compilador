@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.semanticAnalyzer = exports.SemanticAnalyzer = void 0;
 const semantic_cube_1 = require("./semantic-cube");
 const function_directory_1 = require("./function-directory");
+const quadruples_1 = require("../quadruples");
 /**
  * Analizador Semantico - Hace validaciones semanticas
  *
@@ -15,12 +16,22 @@ class SemanticAnalyzer {
         this.currentType = null;
     }
     /**
-     * Inicializa el ambito global
+     * Inicializa el ambito global y el generador de cuádruplos
      */
     processProgram() {
         // Poner el programa principal
         function_directory_1.functionDirectory.addFunction('global', semantic_cube_1.DataType.VOID);
         function_directory_1.functionDirectory.setCurrentFunction('global');
+        // Reiniciar el generador de cuádruplos
+        quadruples_1.quadrupleGenerator.clear();
+        (0, quadruples_1.resetTempCounter)();
+    }
+    /**
+     * Obtiene los cuádruplos generados
+     * @returns Lista de cuádruplos
+     */
+    getQuadruples() {
+        return quadruples_1.quadrupleGenerator.getQuadruples();
     }
     /**
      * Procesa las variables
@@ -125,7 +136,10 @@ class SemanticAnalyzer {
         const isValid = semantic_cube_1.semanticCube.isValidOperation(variable.type, semantic_cube_1.Operator.ASSIGN, exprType);
         if (!isValid) {
             this.addError(`Tipo incompatible en asignación: no se puede asignar ${exprType} a ${variable.type}`, idToken);
+            return;
         }
+        // Generar el cuádruplo de asignación
+        quadruples_1.quadrupleGenerator.generateAssignmentQuadruple(varName, variable.type);
     }
     /**
      * Procesa una expresion
@@ -149,6 +163,8 @@ class SemanticAnalyzer {
         if (operator && operator.length > 0) {
             const opToken = operator[0];
             const opType = opToken.image;
+            // Agregar el operador a la pila
+            quadruples_1.quadrupleGenerator.pushOperator(opType);
             // Procesar el segundo término
             const rightExpNode = expressionNode.children.exp[1];
             this.processExp(rightExpNode);
@@ -163,6 +179,8 @@ class SemanticAnalyzer {
                 this.currentType = semantic_cube_1.DataType.ERROR;
             }
             else {
+                // Generar el cuádruplo para esta operación relacional
+                quadruples_1.quadrupleGenerator.generateExpressionQuadruple();
                 this.currentType = resultType;
             }
         }
@@ -208,6 +226,8 @@ class SemanticAnalyzer {
                 else {
                     break;
                 }
+                // Agregar el operador a la pila antes de procesar el siguiente término
+                quadruples_1.quadrupleGenerator.pushOperator(operator);
                 // Procesar el siguiente término
                 this.processTerm(terms[i]);
                 const rightType = this.currentType;
@@ -221,6 +241,8 @@ class SemanticAnalyzer {
                     this.currentType = semantic_cube_1.DataType.ERROR;
                     return;
                 }
+                // Generar el cuádruplo para esta operación
+                quadruples_1.quadrupleGenerator.generateExpressionQuadruple();
                 currentType = resultType;
             }
             this.currentType = currentType;
@@ -267,6 +289,8 @@ class SemanticAnalyzer {
                 else {
                     break;
                 }
+                // Agregar el operador a la pila antes de procesar el siguiente factor
+                quadruples_1.quadrupleGenerator.pushOperator(operator);
                 // Procesar el siguiente factor
                 this.processFactor(factors[i]);
                 const rightType = this.currentType;
@@ -280,6 +304,8 @@ class SemanticAnalyzer {
                     this.currentType = semantic_cube_1.DataType.ERROR;
                     return;
                 }
+                // Generar el cuádruplo para esta operación
+                quadruples_1.quadrupleGenerator.generateExpressionQuadruple();
                 currentType = resultType;
             }
             this.currentType = currentType;
@@ -309,6 +335,8 @@ class SemanticAnalyzer {
                 this.currentType = semantic_cube_1.DataType.ERROR;
                 return;
             }
+            // Agregar el identificador a la pila de operandos
+            quadruples_1.quadrupleGenerator.pushOperand(varName, variable.type);
             this.currentType = variable.type;
             return;
         }
@@ -325,10 +353,18 @@ class SemanticAnalyzer {
      */
     processCte(cteNode) {
         if (cteNode.children.CteInt) {
+            const intToken = cteNode.children.CteInt[0];
+            const intValue = parseInt(intToken.image);
+            // Agregar la constante a la pila de operandos
+            quadruples_1.quadrupleGenerator.pushOperand(intValue, semantic_cube_1.DataType.INT);
             this.currentType = semantic_cube_1.DataType.INT;
             return;
         }
         if (cteNode.children.CteFloat) {
+            const floatToken = cteNode.children.CteFloat[0];
+            const floatValue = parseFloat(floatToken.image);
+            // Agregar la constante a la pila de operandos
+            quadruples_1.quadrupleGenerator.pushOperand(floatValue, semantic_cube_1.DataType.FLOAT);
             this.currentType = semantic_cube_1.DataType.FLOAT;
             return;
         }

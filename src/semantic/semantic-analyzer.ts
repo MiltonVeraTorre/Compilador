@@ -17,6 +17,11 @@ import {
   ArgListCstNode,
   BabyDuckCstNode
 } from '../parser/cst-types';
+import {
+  quadrupleGenerator,
+  QuadrupleOperator,
+  resetTempCounter
+} from '../quadruples';
 
 /**
  * Interfaz para errores semanticos
@@ -44,12 +49,24 @@ export class SemanticAnalyzer {
   }
 
   /**
-   * Inicializa el ambito global
+   * Inicializa el ambito global y el generador de cuádruplos
    */
   public processProgram() {
     // Poner el programa principal
     functionDirectory.addFunction('global', DataType.VOID);
     functionDirectory.setCurrentFunction('global');
+
+    // Reiniciar el generador de cuádruplos
+    quadrupleGenerator.clear();
+    resetTempCounter();
+  }
+
+  /**
+   * Obtiene los cuádruplos generados
+   * @returns Lista de cuádruplos
+   */
+  public getQuadruples() {
+    return quadrupleGenerator.getQuadruples();
   }
 
   /**
@@ -188,7 +205,11 @@ export class SemanticAnalyzer {
         `Tipo incompatible en asignación: no se puede asignar ${exprType} a ${variable.type}`,
         idToken
       );
+      return;
     }
+
+    // Generar el cuádruplo de asignación
+    quadrupleGenerator.generateAssignmentQuadruple(varName, variable.type);
   }
 
   /**
@@ -218,6 +239,9 @@ export class SemanticAnalyzer {
       const opToken = operator[0];
       const opType = opToken.image as Operator;
 
+      // Agregar el operador a la pila
+      quadrupleGenerator.pushOperator(opType);
+
       // Procesar el segundo término
       const rightExpNode = expressionNode.children.exp[1];
       this.processExp(rightExpNode);
@@ -237,6 +261,9 @@ export class SemanticAnalyzer {
         );
         this.currentType = DataType.ERROR;
       } else {
+        // Generar el cuádruplo para esta operación relacional
+        quadrupleGenerator.generateExpressionQuadruple();
+
         this.currentType = resultType;
       }
     } else {
@@ -287,6 +314,9 @@ export class SemanticAnalyzer {
           break;
         }
 
+        // Agregar el operador a la pila antes de procesar el siguiente término
+        quadrupleGenerator.pushOperator(operator);
+
         // Procesar el siguiente término
         this.processTerm(terms[i]);
         const rightType = this.currentType;
@@ -306,6 +336,9 @@ export class SemanticAnalyzer {
           this.currentType = DataType.ERROR;
           return;
         }
+
+        // Generar el cuádruplo para esta operación
+        quadrupleGenerator.generateExpressionQuadruple();
 
         currentType = resultType;
       }
@@ -359,6 +392,9 @@ export class SemanticAnalyzer {
           break;
         }
 
+        // Agregar el operador a la pila antes de procesar el siguiente factor
+        quadrupleGenerator.pushOperator(operator);
+
         // Procesar el siguiente factor
         this.processFactor(factors[i]);
         const rightType = this.currentType;
@@ -378,6 +414,9 @@ export class SemanticAnalyzer {
           this.currentType = DataType.ERROR;
           return;
         }
+
+        // Generar el cuádruplo para esta operación
+        quadrupleGenerator.generateExpressionQuadruple();
 
         currentType = resultType;
       }
@@ -413,6 +452,9 @@ export class SemanticAnalyzer {
         return;
       }
 
+      // Agregar el identificador a la pila de operandos
+      quadrupleGenerator.pushOperand(varName, variable.type);
+
       this.currentType = variable.type;
       return;
     }
@@ -432,11 +474,23 @@ export class SemanticAnalyzer {
    */
   public processCte(cteNode: CteCstNode) {
     if (cteNode.children.CteInt) {
+      const intToken = cteNode.children.CteInt[0];
+      const intValue = parseInt(intToken.image);
+
+      // Agregar la constante a la pila de operandos
+      quadrupleGenerator.pushOperand(intValue, DataType.INT);
+
       this.currentType = DataType.INT;
       return;
     }
 
     if (cteNode.children.CteFloat) {
+      const floatToken = cteNode.children.CteFloat[0];
+      const floatValue = parseFloat(floatToken.image);
+
+      // Agregar la constante a la pila de operandos
+      quadrupleGenerator.pushOperand(floatValue, DataType.FLOAT);
+
       this.currentType = DataType.FLOAT;
       return;
     }

@@ -1,4 +1,5 @@
 import { parseInput } from './index';
+import { quadrupleToString } from './quadruples';
 
 // Programa de ejemplo en BabyDuck
 const sourceCode = `
@@ -22,7 +23,14 @@ if (result.lexErrors.length > 0 || result.parseErrors.length > 0) {
     lexErrors: result.lexErrors,
     parseErrors: result.parseErrors
   });
+} else if (result.semanticErrors.length > 0) {
+  console.error('Semantic errors:', result.semanticErrors);
 } else {
   console.log('¡Compilación exitosa!');
-  console.log('CST:', JSON.stringify(result.cst, null, 2)); // Árbol de Sintaxis Concreto
+
+  // Mostrar los cuádruplos generados
+  console.log('\nCuádruplos generados:');
+  result.quadruples.forEach((quad, index) => {
+    console.log(`${index}: ${quadrupleToString(quad)}`);
+  });
 }

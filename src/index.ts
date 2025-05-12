@@ -1,6 +1,7 @@
 import { babyDuckLexer } from './lexer/lexer';
 import { babyDuckParser } from './parser/parser';
-import { SemanticError } from './semantic/semantic-analyzer';
+import { SemanticError, semanticAnalyzer } from './semantic/semantic-analyzer';
+import { Quadruple } from './quadruples';
 
 /**
  * Interfaz para el resultado del análisis
@@ -10,6 +11,7 @@ export interface AnalysisResult {
   lexErrors: any[];
   parseErrors: any[];
   semanticErrors: SemanticError[];
+  quadruples: Quadruple[];
 }
 
 /**
@@ -28,7 +30,8 @@ export function parseInput(sourceCode: string): AnalysisResult {
       cst: null,
       lexErrors: lexResult.errors,
       parseErrors: [],
-      semanticErrors: []
+      semanticErrors: [],
+      quadruples: []
     };
   }
 
@@ -44,7 +47,8 @@ export function parseInput(sourceCode: string): AnalysisResult {
     cst: parseResult.cst,
     lexErrors: lexResult.errors,
     parseErrors: parseResult.parseErrors,
-    semanticErrors: parseResult.semanticErrors || []
+    semanticErrors: parseResult.semanticErrors || [],
+    quadruples: semanticAnalyzer.getQuadruples() || []
   };
 }
 

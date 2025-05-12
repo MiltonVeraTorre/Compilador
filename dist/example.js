@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const index_1 = require("./index");
+const quadruples_1 = require("./quadruples");
 // Programa de ejemplo en BabyDuck
 const sourceCode = `
 program example;
@@ -22,7 +23,14 @@ if (result.lexErrors.length > 0 || result.parseErrors.length > 0) {
         parseErrors: result.parseErrors
     });
 }
+else if (result.semanticErrors.length > 0) {
+    console.error('Semantic errors:', result.semanticErrors);
+}
 else {
     console.log('¡Compilación exitosa!');
-    console.log('CST:', JSON.stringify(result.cst, null, 2)); // Árbol de Sintaxis Concreto
+    // Mostrar los cuádruplos generados
+    console.log('\nCuádruplos generados:');
+    result.quadruples.forEach((quad, index) => {
+        console.log(`${index}: ${(0, quadruples_1.quadrupleToString)(quad)}`);
+    });
 }
