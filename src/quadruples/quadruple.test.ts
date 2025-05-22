@@ -33,10 +33,11 @@ describe('Generación de Cuádruplos BabyDuck', () => {
 
     // Verificar asignación de constantes
     expect(quadruples[0].operator).toBe('=');
-    expect(quadruples[0].result).toBe('x');
+    // Ahora result es una dirección virtual, no un nombre
+    expect(typeof quadruples[0].result).toBe('number');
 
     expect(quadruples[1].operator).toBe('=');
-    expect(quadruples[1].result).toBe('y');
+    expect(typeof quadruples[1].result).toBe('number');
 
     // Verificar suma y asignación
     const sumQuad = quadruples.find(q => q.operator === '+');
@@ -44,7 +45,8 @@ describe('Generación de Cuádruplos BabyDuck', () => {
 
     const lastAssign = quadruples[quadruples.length - 1];
     expect(lastAssign.operator).toBe('=');
-    expect(lastAssign.result).toBe('z');
+    // Ahora result es una dirección virtual, no un nombre
+    expect(typeof lastAssign.result).toBe('number');
   });
 
   // Prueba 2: Expresiones aritméticas complejas
@@ -88,7 +90,8 @@ describe('Generación de Cuádruplos BabyDuck', () => {
     // La última asignación debe ser a result
     const lastAssign = quadruples[quadruples.length - 1];
     expect(lastAssign.operator).toBe('=');
-    expect(lastAssign.result).toBe('result');
+    // Ahora result es una dirección virtual, no un nombre
+    expect(typeof lastAssign.result).toBe('number');
   });
 
   // Prueba 3: Expresiones relacionales

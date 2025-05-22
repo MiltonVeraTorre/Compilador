@@ -140,6 +140,31 @@ export class FunctionDirectory {
   }
 
   /**
+   * Asigna una dirección de memoria a una variable
+   * @param name Nombre de la variable
+   * @param address Dirección de memoria
+   * @returns true si se asignó correctamente, false si no se encontró la variable
+   */
+  public setVariableAddress(name: string, address: number): boolean {
+    // Primero buscar en el ámbito actual
+    if (this.currentFunction) {
+      const func = this.functions.get(this.currentFunction);
+      if (func) {
+        if (func.variableTable.variableExists(name)) {
+          return func.variableTable.setVariableAddress(name, address);
+        }
+      }
+    }
+
+    // Si no se encuentra, buscar globalmente
+    if (this.globalVariableTable.variableExists(name)) {
+      return this.globalVariableTable.setVariableAddress(name, address);
+    }
+
+    return false;
+  }
+
+  /**
    * Busca una funcion
    * @param name Nombre
    * @returns La funcion o undefined

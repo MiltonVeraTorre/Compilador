@@ -15,7 +15,12 @@ import {
   CteCstNode,
   FCallCstNode,
   ArgListCstNode,
-  BabyDuckCstNode
+  BabyDuckCstNode,
+  ConditionCstNode,
+  CycleCstNode,
+  BodyCstNode,
+  PrintCstNode,
+  StatementCstNode
 } from '../parser/cst-types';
 import {
   quadrupleGenerator,
@@ -540,6 +545,152 @@ export class SemanticAnalyzer {
         `Faltan argumentos en la llamada a la función: ${funcName}`,
         idToken
       );
+    }
+  }
+
+  /**
+   * Procesa un estatuto de condición (if-else)
+   * @param conditionNode Nodo de condición
+   */
+  public processCondition(conditionNode: ConditionCstNode) {
+    // Procesar la expresión de la condición
+    this.processExpression(conditionNode.children.expression[0]);
+    const conditionType = this.currentType;
+
+    // Verificar que la condición sea de tipo entero (booleano)
+    if (conditionType !== DataType.INT) {
+      this.addError(
+        `La condición debe ser de tipo entero (booleano), no ${conditionType}`,
+        conditionNode.children.expression[0]
+      );
+    }
+
+    // Generar el cuádruplo GOTOF (salto si falso)
+    const gotofIndex = quadrupleGenerator.generateGotofQuadruple();
+
+    // Procesar el cuerpo del if
+    this.processBody(conditionNode.children.body[0]);
+
+    // Si hay un else
+    if (conditionNode.children.Else) {
+      // Generar un GOTO para saltar el else después de ejecutar el if
+      const gotoIndex = quadrupleGenerator.generateGotoQuadruple();
+
+      // Completar el GOTOF para saltar al else si la condición es falsa
+      quadrupleGenerator.fillJump(gotofIndex, quadrupleGenerator.getNextQuadIndex());
+
+      // Procesar el cuerpo del else
+      this.processBody(conditionNode.children.body[1]);
+
+      // Completar el GOTO para saltar después del else
+      quadrupleGenerator.fillJump(gotoIndex, quadrupleGenerator.getNextQuadIndex());
+    } else {
+      // Si no hay else, completar el GOTOF para saltar después del if
+      quadrupleGenerator.fillJump(gotofIndex, quadrupleGenerator.getNextQuadIndex());
+    }
+  }
+
+  /**
+   * Procesa un estatuto de ciclo (while)
+   * @param cycleNode Nodo de ciclo
+   */
+  public processCycle(cycleNode: CycleCstNode) {
+    // Guardar el índice de inicio del ciclo
+    const startIndex = quadrupleGenerator.getNextQuadIndex();
+
+    // Procesar la expresión de la condición
+    this.processExpression(cycleNode.children.expression[0]);
+    const conditionType = this.currentType;
+
+    // Verificar que la condición sea de tipo entero (booleano)
+    if (conditionType !== DataType.INT) {
+      this.addError(
+        `La condición debe ser de tipo entero (booleano), no ${conditionType}`,
+        cycleNode.children.expression[0]
+      );
+    }
+
+    // Generar el cuádruplo GOTOF (salto si falso)
+    const gotofIndex = quadrupleGenerator.generateGotofQuadruple();
+
+    // Procesar el cuerpo del ciclo
+    this.processBody(cycleNode.children.body[0]);
+
+    // Generar el cuádruplo GOTO para volver al inicio del ciclo
+    const gotoIndex = quadrupleGenerator.generateGotoQuadruple();
+    quadrupleGenerator.fillJump(gotoIndex, startIndex);
+
+    // Completar el GOTOF para saltar después del ciclo si la condición es falsa
+    quadrupleGenerator.fillJump(gotofIndex, quadrupleGenerator.getNextQuadIndex());
+  }
+
+  /**
+   * Procesa un cuerpo (bloque de código)
+   * @param bodyNode Nodo de cuerpo
+   */
+  public processBody(bodyNode: BodyCstNode) {
+    // Procesar cada estatuto en el cuerpo
+    if (bodyNode.children.statement) {
+      for (const statementNode of bodyNode.children.statement) {
+        this.processStatement(statementNode);
+      }
+    }
+  }
+
+  /**
+   * Procesa un estatuto
+   * @param statementNode Nodo de estatuto
+   */
+  public processStatement(statementNode: StatementCstNode) {
+    // Procesar asignación
+    if (statementNode.children.assign && statementNode.children.assign.length > 0) {
+      this.processAssign(statementNode.children.assign[0]);
+    }
+
+    // Procesar condición
+    if (statementNode.children.condition && statementNode.children.condition.length > 0) {
+      this.processCondition(statementNode.children.condition[0]);
+    }
+
+    // Procesar ciclo
+    if (statementNode.children.cycle && statementNode.children.cycle.length > 0) {
+      this.processCycle(statementNode.children.cycle[0]);
+    }
+
+    // Procesar llamada a función
+    if (statementNode.children.f_call && statementNode.children.f_call.length > 0) {
+      this.processFunctionCall(statementNode.children.f_call[0]);
+    }
+
+    // Procesar print
+    if (statementNode.children.print && statementNode.children.print.length > 0) {
+      this.processPrint(statementNode.children.print[0]);
+    }
+  }
+
+  /**
+   * Procesa un estatuto de impresión
+   * @param printNode Nodo de print
+   */
+  public processPrint(printNode: PrintCstNode) {
+    // Si hay una expresión, procesarla
+    if (printNode.children.expression && printNode.children.expression.length > 0) {
+      this.processExpression(printNode.children.expression[0]);
+
+      // Generar el cuádruplo para imprimir
+      quadrupleGenerator.generatePrintQuadruple();
+    }
+
+    // Si hay una cadena literal, procesarla
+    if (printNode.children.CteString && printNode.children.CteString.length > 0) {
+      const stringToken = printNode.children.CteString[0];
+      const stringValue = stringToken.image;
+
+      // Agregar la cadena como operando
+      quadrupleGenerator.pushOperand(stringValue, DataType.STRING);
+
+      // Generar el cuádruplo para imprimir
+      quadrupleGenerator.generatePrintQuadruple();
     }
   }
 

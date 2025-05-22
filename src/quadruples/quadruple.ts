@@ -1,8 +1,9 @@
-import { Operator } from '../semantic/semantic-cube';
+import { Operator, DataType } from '../semantic/semantic-cube';
+import { virtualMemory } from '../memory/virtual-memory';
 
 /**
  * Operadores adicionales para cuádruplos
- * 
+ *
  * Extiende los operadores básicos del cubo semántico
  */
 export enum QuadrupleOperator {
@@ -30,29 +31,30 @@ export enum QuadrupleOperator {
 
 /**
  * Estructura de un cuádruplo
- * 
+ *
  * Representa una instrucción de código intermedio
+ * Los operandos y resultados ahora son direcciones virtuales (números)
  */
 export interface Quadruple {
   operator: QuadrupleOperator | Operator;
-  leftOperand: string | number | null;
-  rightOperand: string | number | null;
-  result: string | number | null;
+  leftOperand: number | null;
+  rightOperand: number | null;
+  result: number | null;
 }
 
 /**
  * Crea un nuevo cuádruplo
  * @param operator Operador
- * @param leftOperand Operando izquierdo
- * @param rightOperand Operando derecho
- * @param result Resultado
+ * @param leftOperand Operando izquierdo (dirección virtual)
+ * @param rightOperand Operando derecho (dirección virtual)
+ * @param result Resultado (dirección virtual)
  * @returns Cuádruplo creado
  */
 export function createQuadruple(
   operator: QuadrupleOperator | Operator,
-  leftOperand: string | number | null = null,
-  rightOperand: string | number | null = null,
-  result: string | number | null = null
+  leftOperand: number | null = null,
+  rightOperand: number | null = null,
+  result: number | null = null
 ): Quadruple {
   return {
     operator,
@@ -72,21 +74,19 @@ export function quadrupleToString(quad: Quadruple): string {
 }
 
 /**
- * Contador para generar temporales únicos
+ * Genera una dirección para una variable temporal
+ * @param type Tipo de dato
+ * @returns Dirección virtual
  */
-let tempCounter = 0;
-
-/**
- * Genera un nombre de variable temporal único
- * @returns Nombre de variable temporal
- */
-export function generateTempVar(): string {
-  return `t${tempCounter++}`;
+export function generateTempVar(type: DataType): number {
+  return virtualMemory.assignTempAddress(type);
 }
 
 /**
  * Reinicia el contador de temporales
+ * (Ahora se maneja en la memoria virtual)
  */
 export function resetTempCounter(): void {
-  tempCounter = 0;
+  // La memoria virtual se encarga de esto ahora
+  virtualMemory.reset();
 }
