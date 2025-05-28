@@ -15,6 +15,7 @@ export const If = createToken({ name: "If", pattern: /if/ });
 export const Else = createToken({ name: "Else", pattern: /else/ });
 export const Do = createToken({ name: "Do", pattern: /do/ });
 export const Print = createToken({ name: "Print", pattern: /print/ });
+export const Read = createToken({ name: "Read", pattern: /read/ });
 
 // Símbolos
 export const LBrace = createToken({ name: "LBrace", pattern: /{/ });
@@ -30,6 +31,12 @@ export const Equals = createToken({ name: "Equals", pattern: /=/ });
 export const GreaterThan = createToken({ name: "GreaterThan", pattern: />/ });
 export const LessThan = createToken({ name: "LessThan", pattern: /</ });
 export const NotEquals = createToken({ name: "NotEquals", pattern: /!=/ });
+export const GreaterEquals = createToken({ name: "GreaterEquals", pattern: />=/ });
+export const LessEquals = createToken({ name: "LessEquals", pattern: /<=/ });
+export const EqualsEquals = createToken({ name: "EqualsEquals", pattern: /==/ });
+export const And = createToken({ name: "And", pattern: /&&/ });
+export const Or = createToken({ name: "Or", pattern: /\|\|/ });
+export const Not = createToken({ name: "Not", pattern: /!/ });
 export const Plus = createToken({ name: "Plus", pattern: /\+/ });
 export const Minus = createToken({ name: "Minus", pattern: /-/ });
 export const Multiply = createToken({ name: "Multiply", pattern: /\*/ });
@@ -59,7 +66,7 @@ export const Identifier = createToken({
   pattern: /[a-zA-Z_][a-zA-Z0-9_]*/,
   longer_alt: [
     Program, Main, End, Var, Int, Float, Void,
-    While, If, Else, Do, Print // Omitir las palabras clave
+    While, If, Else, Do, Print, Read // Omitir las palabras clave
   ]
 });
 
@@ -82,6 +89,7 @@ export const allTokens = [
   Else,
   Do,
   Print,
+  Read,
 
   // Símbolos
   LBrace,
@@ -93,10 +101,16 @@ export const allTokens = [
   SemiColon,
   Colon,
   Comma,
+  EqualsEquals,
+  GreaterEquals,
+  LessEquals,
+  NotEquals,
+  And,
+  Or,
   Equals,
   GreaterThan,
   LessThan,
-  NotEquals,
+  Not,
   Plus,
   Minus,
   Multiply,

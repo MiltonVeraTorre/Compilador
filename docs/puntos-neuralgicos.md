@@ -68,19 +68,30 @@ main -> MAIN {32} body {33}
 
 4. **{4} - Declaración de función (nombre)**
    - Acción: Registrar el nombre de la función y crear un nuevo ámbito.
+   - Verificar que la función no esté ya declarada.
+   - Agregar la función al directorio de funciones.
+   - Establecer la función como el ámbito actual.
 
 5. **{5} - Declaración de función (tipo de retorno)**
    - Acción: Establecer el tipo de retorno de la función.
+   - Validar que el tipo sea válido (INT, FLOAT, STRING, o VOID).
+   - Guardar la dirección de inicio de la función (índice del siguiente cuádruplo).
 
 6. **{6} - Fin de función**
    - Acción: Generar cuádruplo ENDPROC y volver al ámbito anterior.
+   - Si la función no es VOID, verificar que tenga al menos un RETURN.
+   - Asignar direcciones virtuales a todas las variables locales.
+   - Calcular el tamaño total del espacio de activación.
 
 7. **{7} - Declaración de parámetro (nombre)**
    - Acción: Guardar el nombre del parámetro para su posterior registro.
+   - Verificar que el parámetro no esté ya declarado en la función.
 
 8. **{8} - Declaración de parámetro (tipo)**
    - Acción: Registrar el parámetro con su tipo en la tabla de variables de la función.
    - Asignar una dirección virtual al parámetro según su tipo.
+   - Agregar el parámetro a la lista de parámetros de la función.
+   - Incrementar el contador de parámetros.
 
 ### Asignaciones y Expresiones
 
@@ -160,16 +171,35 @@ main -> MAIN {32} body {33}
 
 27. **{27} - Llamada a función (nombre)**
     - Acción: Verificar que la función esté declarada.
-    - Generar cuádruplo ERA para reservar espacio.
+    - Buscar la función en el directorio de funciones.
+    - Generar cuádruplo ERA para reservar espacio de activación.
+    - Calcular el tamaño del espacio basado en variables locales y parámetros.
+    - Inicializar contador de argumentos.
 
 28. **{28} - Fin de llamada a función**
     - Acción: Verificar que el número de argumentos coincida con el número de parámetros.
     - Generar cuádruplo GOSUB para saltar a la función.
+    - Si la función retorna un valor, asignar dirección temporal para el resultado.
+    - Apilar el resultado en las pilas de operandos y tipos (si aplica).
 
 29. **{29} - Argumento de función**
-    - Acción: Evaluar la expresión.
+    - Acción: Evaluar la expresión del argumento.
     - Verificar compatibilidad de tipos con el parámetro correspondiente.
     - Generar cuádruplo PARAM para pasar el argumento.
+    - Incrementar el contador de argumentos.
+    - Verificar que no se excedan los parámetros esperados.
+
+### Retorno de Funciones
+
+34. **{34} - Retorno con valor**
+    - Acción: Evaluar la expresión de retorno.
+    - Verificar que el tipo coincida con el tipo de retorno de la función.
+    - Generar cuádruplo RETURN con el valor.
+    - Verificar que la función no sea de tipo VOID.
+
+35. **{35} - Retorno sin valor**
+    - Acción: Generar cuádruplo RETURN sin valor.
+    - Verificar que la función sea de tipo VOID.
 
 ### Impresión
 

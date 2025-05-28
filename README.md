@@ -164,6 +164,12 @@ src/
     quadruple-generator.ts  # Generador de cuádruplos
     index.ts                # Exportaciones de componentes de cuádruplos
     quadruple.test.ts       # Pruebas para cuádruplos
+  virtual-machine/
+    virtual-machine.ts      # Máquina virtual principal
+    execution-memory.ts     # Mapa de memoria de ejecución
+    activation-context.ts   # Contextos de activación para funciones
+    virtual-machine.test.ts # Pruebas para la máquina virtual
+    index.ts                # Exportaciones de la máquina virtual
   index.ts         # Entrada principal del compilador
   index.test.ts    # Tests básicos con Jest
   semantic.test.ts # Tests semánticos
@@ -442,11 +448,17 @@ Al hacerlo todo en un mismo flujo, el compilador es más rápido y encuentra err
 - ✅ Fila de cuádruplos
 - ✅ Generación de cuádruplos para expresiones aritméticas y relacionales
 - ✅ Generación de cuádruplos para estatutos lineales
+- ✅ Sistema de memoria virtual con direcciones virtuales
+- ✅ Generación de cuádruplos para estatutos de control (if, while)
+- ✅ Generación de cuádruplos para funciones (ERA, PARAM, GOSUB, RETURN, ENDPROC)
+- ✅ Máquina Virtual para ejecución de cuádruplos
+- ✅ Contextos de activación para manejo de funciones
+- ✅ Mapa de memoria de ejecución
 
 ## En Desarrollo
-- 🔄 Asignación de memoria virtual
-- 🔄 Generación de cuádruplos para estatutos no lineales (if, while)
-- 🔄 Generación de cuádruplos para funciones
+- 🔄 Optimizaciones de la máquina virtual
+- 🔄 Manejo avanzado de errores en tiempo de ejecución
+- 🔄 Depurador integrado
 
 # Documentación de Estructuras para Generación de Código Intermedio
 
@@ -506,4 +518,86 @@ Cada punto neurálgico realiza las siguientes acciones:
 2. Generar variables temporales si es necesario
 3. Generar el cuádruplo correspondiente
 4. Actualizar las pilas de operandos y tipos
+
+# Máquina Virtual de BabyDuck
+
+## Arquitectura de la Máquina Virtual
+
+La máquina virtual implementa un modelo de ejecución basado en:
+
+### Memoria Virtual Segmentada
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    MEMORIA VIRTUAL                          │
+├─────────────────────────────────────────────────────────────┤
+│ GLOBALES (1000-4999)    │ Variables del programa principal │
+│ LOCALES (5000-8999)     │ Variables de funciones           │
+│ TEMPORALES (9000-12999) │ Variables temporales             │
+│ CONSTANTES (13000-16999)│ Valores literales                │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Contextos de Activación
+
+Cada función tiene su propio contexto que incluye:
+- **Memoria Local**: Variables y parámetros de la función
+- **Dirección de Retorno**: Donde continuar después del RETURN
+- **Valor de Retorno**: Resultado de la función (si aplica)
+
+### Cuádruplos de Funciones
+
+La máquina virtual ejecuta los siguientes cuádruplos especiales para funciones:
+
+- **ERA**: Crea espacio de activación para una función
+- **PARAM**: Pasa parámetros a la función
+- **GOSUB**: Salta a la función y guarda dirección de retorno
+- **RETURN**: Retorna de la función con valor opcional
+- **ENDPROC**: Marca el final de una función
+
+## Ejemplo de Ejecución
+
+### Código BabyDuck
+```
+func suma(a: int, b: int): int
+  return a + b;
+
+main {
+  var resultado: int;
+  resultado = suma(5, 3);
+  print(resultado);
+}
+```
+
+### Cuádruplos Generados
+```
+0: (ERA, 2, _, _)           // Espacio para suma
+1: (PARAM, 13000, 0, _)     // Pasar 5
+2: (PARAM, 13001, 1, _)     // Pasar 3
+3: (GOSUB, 6, _, 9000)      // Llamar suma
+4: (=, 9000, _, 1000)       // Asignar resultado
+5: (PRINT, 1000, _, _)      // Imprimir
+6: (+, 5000, 5001, 9001)    // a + b
+7: (RETURN, 9001, _, _)     // Retornar
+8: (ENDPROC, _, _, _)       // Fin función
+```
+
+### Ejecución Paso a Paso
+1. **ERA**: Crear contexto para función `suma`
+2. **PARAM**: Pasar valores 5 y 3 como parámetros
+3. **GOSUB**: Saltar a función, guardar dirección de retorno
+4. **+**: Ejecutar suma dentro del contexto de la función
+5. **RETURN**: Retornar resultado y destruir contexto
+6. **=**: Asignar resultado a variable global
+7. **PRINT**: Imprimir resultado final (8)
+
+## Manejo de Errores
+
+La máquina virtual detecta y maneja:
+- División por cero
+- Acceso a memoria no inicializada
+- Desbordamiento de pila de activación
+- Tipos incompatibles en operaciones
+
+Para más detalles, consulta la [documentación completa de la máquina virtual](docs/maquina-virtual.md).
 

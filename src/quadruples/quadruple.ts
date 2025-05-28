@@ -14,11 +14,18 @@ export enum QuadrupleOperator {
   DIVIDE = '/',
   GREATER_THAN = '>',
   LESS_THAN = '<',
+  GREATER_EQUALS = '>=',
+  LESS_EQUALS = '<=',
+  EQUALS = '==',
   NOT_EQUALS = '!=',
+  AND = '&&',
+  OR = '||',
+  NOT = '!',
   ASSIGN = '=',
 
   // Operadores adicionales para cuádruplos
   PRINT = 'print',
+  READ = 'read',
   GOTO = 'goto',
   GOTOF = 'gotof', // goto falso
   GOTOT = 'gotot', // goto verdadero

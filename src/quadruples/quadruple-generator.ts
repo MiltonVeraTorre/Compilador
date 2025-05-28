@@ -31,6 +31,11 @@ export class QuadrupleGenerator {
   // Contador para saltos
   private jumpCounter: number;
 
+  // Pilas para manejo de funciones
+  private parameterStack: Stack<number>; // Direcciones de parámetros
+  private callStack: Stack<string>; // Nombres de funciones llamadas
+  private returnStack: Stack<number>; // Direcciones de retorno
+
   constructor() {
     this.operatorStack = new Stack<Operator | QuadrupleOperator>();
     this.operandStack = new Stack<number>();
@@ -38,6 +43,11 @@ export class QuadrupleGenerator {
     this.quadruples = new Queue<Quadruple>();
     this.addressMap = new Map<string, number>();
     this.jumpCounter = 0;
+
+    // Inicializar pilas para funciones
+    this.parameterStack = new Stack<number>();
+    this.callStack = new Stack<string>();
+    this.returnStack = new Stack<number>();
   }
 
   /**
@@ -297,6 +307,151 @@ export class QuadrupleGenerator {
   }
 
   /**
+   * Genera un cuádruplo ERA (Espacio de Activación)
+   * @param functionName Nombre de la función
+   */
+  public generateEraQuadruple(functionName: string): void {
+    // Buscar la función en el directorio
+    const func = functionDirectory.lookupFunction(functionName);
+    if (!func) {
+      throw new Error(`Error: función '${functionName}' no encontrada`);
+    }
+
+    // Calcular el tamaño del espacio de activación
+    // (número de variables locales + parámetros)
+    const localVars = func.variableTable.getAllVariables().length;
+    const paramCount = func.parameters.length;
+    const activationSize = localVars + paramCount;
+
+    // Crear cuádruplo ERA con el tamaño del espacio
+    const quadruple = createQuadruple(
+      QuadrupleOperator.ERA,
+      activationSize,
+      null,
+      null
+    );
+    this.quadruples.enqueue(quadruple);
+
+    // Guardar el nombre de la función en la pila de llamadas
+    this.callStack.push(functionName);
+  }
+
+  /**
+   * Genera un cuádruplo PARAM para pasar parámetros
+   * @param paramIndex Índice del parámetro (0, 1, 2, ...)
+   */
+  public generateParamQuadruple(paramIndex: number): void {
+    // Obtener el valor del parámetro de la pila de operandos
+    const paramAddress = this.operandStack.pop();
+    const paramType = this.typeStack.pop();
+
+    if (paramAddress === undefined || paramType === undefined) {
+      throw new Error('Error: valor de parámetro faltante');
+    }
+
+    // Crear cuádruplo PARAM
+    const quadruple = createQuadruple(
+      QuadrupleOperator.PARAM,
+      paramAddress,
+      paramIndex,
+      null
+    );
+    this.quadruples.enqueue(quadruple);
+
+    // Guardar la dirección del parámetro
+    this.parameterStack.push(paramAddress);
+  }
+
+  /**
+   * Genera un cuádruplo GOSUB para llamar a una función
+   * @param functionName Nombre de la función
+   * @returns Dirección donde se guardará el valor de retorno (si aplica)
+   */
+  public generateGosubQuadruple(functionName: string): number | null {
+    // Buscar la función en el directorio
+    const func = functionDirectory.lookupFunction(functionName);
+    if (!func) {
+      throw new Error(`Error: función '${functionName}' no encontrada`);
+    }
+
+    // Obtener la dirección de inicio de la función
+    // (esto se llenará después cuando se procese la función)
+    const functionStartAddress = this.getNextQuadIndex() + 1;
+
+    // Si la función retorna un valor, asignar dirección temporal
+    let returnAddress: number | null = null;
+    if (func.type !== DataType.VOID) {
+      returnAddress = virtualMemory.assignTempAddress(func.type);
+
+      // Agregar el resultado a las pilas
+      this.operandStack.push(returnAddress);
+      this.typeStack.push(func.type);
+    }
+
+    // Crear cuádruplo GOSUB con la dirección de resultado
+    const quadruple = createQuadruple(
+      QuadrupleOperator.GOSUB,
+      functionStartAddress,
+      null,
+      returnAddress  // Aquí va la dirección donde guardar el resultado
+    );
+    this.quadruples.enqueue(quadruple);
+
+    return returnAddress;
+  }
+
+  /**
+   * Genera un cuádruplo RETURN para retornar de una función
+   * @param hasReturnValue Si la función retorna un valor
+   */
+  public generateReturnQuadruple(hasReturnValue: boolean = false): void {
+    let returnValue: number | null = null;
+
+    if (hasReturnValue) {
+      // Obtener el valor de retorno de la pila
+      const returnValueFromStack = this.operandStack.pop();
+      const returnType = this.typeStack.pop();
+
+      if (returnValueFromStack === undefined || returnType === undefined) {
+        throw new Error('Error: valor de retorno faltante');
+      }
+
+      returnValue = returnValueFromStack;
+
+      // Verificar que el tipo coincida con el tipo de retorno de la función
+      const currentFunction = functionDirectory.getCurrentFunction();
+      if (currentFunction) {
+        const func = functionDirectory.lookupFunction(currentFunction);
+        if (func && func.type !== returnType) {
+          throw new Error(`Error: tipo de retorno incorrecto. Esperado: ${func.type}, Recibido: ${returnType}`);
+        }
+      }
+    }
+
+    // Crear cuádruplo RETURN
+    const quadruple = createQuadruple(
+      QuadrupleOperator.RETURN,
+      returnValue,
+      null,
+      null
+    );
+    this.quadruples.enqueue(quadruple);
+  }
+
+  /**
+   * Genera un cuádruplo ENDPROC para marcar el final de una función
+   */
+  public generateEndprocQuadruple(): void {
+    const quadruple = createQuadruple(
+      QuadrupleOperator.ENDPROC,
+      null,
+      null,
+      null
+    );
+    this.quadruples.enqueue(quadruple);
+  }
+
+  /**
    * Obtiene todos los cuádruplos generados
    * @returns Lista de cuádruplos
    */
@@ -314,6 +469,11 @@ export class QuadrupleGenerator {
     this.quadruples.clear();
     this.addressMap.clear();
     this.jumpCounter = 0;
+
+    // Limpiar pilas de funciones
+    this.parameterStack.clear();
+    this.callStack.clear();
+    this.returnStack.clear();
   }
 }
 
