@@ -78,66 +78,19 @@ class BabyDuckParser {
      * @param bodyNode Nodo del cuerpo
      */
     processBody(bodyNode) {
-        // Procesar cada statement
-        if (bodyNode.children.statement && bodyNode.children.statement.length > 0) {
-            for (const statementNode of bodyNode.children.statement) {
-                this.processStatement(statementNode);
-            }
-        }
+        // Usar el método processBody del analizador semántico
+        semantic_analyzer_1.semanticAnalyzer.processBody(bodyNode);
     }
     /**
      * Procesa un statement
      * @param statementNode Nodo del statement
      */
     processStatement(statementNode) {
-        // Procesar asignación
-        if (statementNode.children.assign && statementNode.children.assign.length > 0) {
-            semantic_analyzer_1.semanticAnalyzer.processAssign(statementNode.children.assign[0]);
-        }
-        // Procesar condición
-        if (statementNode.children.condition && statementNode.children.condition.length > 0) {
-            const conditionNode = statementNode.children.condition[0];
-            // Procesar la expresión de la condición
-            if (conditionNode.children.expression && conditionNode.children.expression.length > 0) {
-                semantic_analyzer_1.semanticAnalyzer.processExpression(conditionNode.children.expression[0]);
-            }
-            // Procesar el cuerpo de la condición
-            if (conditionNode.children.body && conditionNode.children.body.length > 0) {
-                this.processBody(conditionNode.children.body[0]);
-            }
-            // Procesar el cuerpo del else si existe
-            if (conditionNode.children.body && conditionNode.children.body.length > 1) {
-                this.processBody(conditionNode.children.body[1]);
-            }
-        }
-        // Procesar ciclo
-        if (statementNode.children.cycle && statementNode.children.cycle.length > 0) {
-            const cycleNode = statementNode.children.cycle[0];
-            // Procesar la expresión del ciclo
-            if (cycleNode.children.expression && cycleNode.children.expression.length > 0) {
-                semantic_analyzer_1.semanticAnalyzer.processExpression(cycleNode.children.expression[0]);
-            }
-            // Procesar el cuerpo del ciclo
-            if (cycleNode.children.body && cycleNode.children.body.length > 0) {
-                this.processBody(cycleNode.children.body[0]);
-            }
-        }
-        // Procesar llamada a función
-        if (statementNode.children.f_call && statementNode.children.f_call.length > 0) {
-            semantic_analyzer_1.semanticAnalyzer.processFunctionCall(statementNode.children.f_call[0]);
-        }
-        // Procesar print
-        if (statementNode.children.print && statementNode.children.print.length > 0) {
-            const printNode = statementNode.children.print[0];
-            // Procesar las expresiones del print
-            if (printNode.children.expression && printNode.children.expression.length > 0) {
-                for (const expressionNode of printNode.children.expression) {
-                    semantic_analyzer_1.semanticAnalyzer.processExpression(expressionNode);
-                }
-            }
-        }
+        // Usar el método processStatement del analizador semántico
+        semantic_analyzer_1.semanticAnalyzer.processStatement(statementNode);
     }
 }
 exports.BabyDuckParser = BabyDuckParser;
 // Exportar un singleton
 exports.babyDuckParser = new BabyDuckParser();
+//# sourceMappingURL=parser.js.map

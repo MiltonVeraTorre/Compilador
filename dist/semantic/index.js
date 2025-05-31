@@ -18,3 +18,4 @@ Object.defineProperty(exports, "VariableTable", { enumerable: true, get: functio
 var semantic_analyzer_1 = require("./semantic-analyzer");
 Object.defineProperty(exports, "SemanticAnalyzer", { enumerable: true, get: function () { return semantic_analyzer_1.SemanticAnalyzer; } });
 Object.defineProperty(exports, "semanticAnalyzer", { enumerable: true, get: function () { return semantic_analyzer_1.semanticAnalyzer; } });
+//# sourceMappingURL=index.js.map

@@ -395,4 +395,8 @@ export class VirtualMachine {
     this.output = [];
     this.running = false;
   }
+
+  public getMemoryDebugInfo(): any {
+    return this.memory.getDebugInfo();
+  }
 }

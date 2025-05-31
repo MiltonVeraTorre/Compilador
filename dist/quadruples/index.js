@@ -19,3 +19,4 @@ __exportStar(require("./stack"), exports);
 __exportStar(require("./queue"), exports);
 __exportStar(require("./quadruple"), exports);
 __exportStar(require("./quadruple-generator"), exports);
+//# sourceMappingURL=index.js.map

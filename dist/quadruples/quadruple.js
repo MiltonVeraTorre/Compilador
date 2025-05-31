@@ -5,6 +5,7 @@ exports.createQuadruple = createQuadruple;
 exports.quadrupleToString = quadrupleToString;
 exports.generateTempVar = generateTempVar;
 exports.resetTempCounter = resetTempCounter;
+const virtual_memory_1 = require("../memory/virtual-memory");
 /**
  * Operadores adicionales para cuádruplos
  *
@@ -19,10 +20,17 @@ var QuadrupleOperator;
     QuadrupleOperator["DIVIDE"] = "/";
     QuadrupleOperator["GREATER_THAN"] = ">";
     QuadrupleOperator["LESS_THAN"] = "<";
+    QuadrupleOperator["GREATER_EQUALS"] = ">=";
+    QuadrupleOperator["LESS_EQUALS"] = "<=";
+    QuadrupleOperator["EQUALS"] = "==";
     QuadrupleOperator["NOT_EQUALS"] = "!=";
+    QuadrupleOperator["AND"] = "&&";
+    QuadrupleOperator["OR"] = "||";
+    QuadrupleOperator["NOT"] = "!";
     QuadrupleOperator["ASSIGN"] = "=";
     // Operadores adicionales para cuádruplos
     QuadrupleOperator["PRINT"] = "print";
+    QuadrupleOperator["READ"] = "read";
     QuadrupleOperator["GOTO"] = "goto";
     QuadrupleOperator["GOTOF"] = "gotof";
     QuadrupleOperator["GOTOT"] = "gotot";
@@ -35,9 +43,9 @@ var QuadrupleOperator;
 /**
  * Crea un nuevo cuádruplo
  * @param operator Operador
- * @param leftOperand Operando izquierdo
- * @param rightOperand Operando derecho
- * @param result Resultado
+ * @param leftOperand Operando izquierdo (dirección virtual)
+ * @param rightOperand Operando derecho (dirección virtual)
+ * @param result Resultado (dirección virtual)
  * @returns Cuádruplo creado
  */
 function createQuadruple(operator, leftOperand = null, rightOperand = null, result = null) {
@@ -58,19 +66,19 @@ function quadrupleToString(quad) {
     return `(${quad.operator}, ${(_a = quad.leftOperand) !== null && _a !== void 0 ? _a : '_'}, ${(_b = quad.rightOperand) !== null && _b !== void 0 ? _b : '_'}, ${(_c = quad.result) !== null && _c !== void 0 ? _c : '_'})`;
 }
 /**
- * Contador para generar temporales únicos
+ * Genera una dirección para una variable temporal
+ * @param type Tipo de dato
+ * @returns Dirección virtual
  */
-let tempCounter = 0;
-/**
- * Genera un nombre de variable temporal único
- * @returns Nombre de variable temporal
- */
-function generateTempVar() {
-    return `t${tempCounter++}`;
+function generateTempVar(type) {
+    return virtual_memory_1.virtualMemory.assignTempAddress(type);
 }
 /**
  * Reinicia el contador de temporales
+ * (Ahora se maneja en la memoria virtual)
  */
 function resetTempCounter() {
-    tempCounter = 0;
+    // La memoria virtual se encarga de esto ahora
+    virtual_memory_1.virtualMemory.reset();
 }
+//# sourceMappingURL=quadruple.js.map

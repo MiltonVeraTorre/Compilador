@@ -25,7 +25,14 @@ var Operator;
     // Relacionales
     Operator["GREATER_THAN"] = ">";
     Operator["LESS_THAN"] = "<";
+    Operator["GREATER_EQUALS"] = ">=";
+    Operator["LESS_EQUALS"] = "<=";
+    Operator["EQUALS"] = "==";
     Operator["NOT_EQUALS"] = "!=";
+    // Logicos
+    Operator["AND"] = "&&";
+    Operator["OR"] = "||";
+    Operator["NOT"] = "!";
     // Asignacion
     Operator["ASSIGN"] = "=";
 })(Operator || (exports.Operator = Operator = {}));
@@ -76,29 +83,53 @@ class SemanticCube {
         this.setCubeValue(DataType.FLOAT, Operator.MULTIPLY, DataType.FLOAT, DataType.FLOAT);
         // float / float = float
         this.setCubeValue(DataType.FLOAT, Operator.DIVIDE, DataType.FLOAT, DataType.FLOAT);
-        // Operaciones relacionales: >, <, !=
+        // Operaciones relacionales: >, <, >=, <=, ==, !=
         // int > int = int (representando booleano)
         this.setCubeValue(DataType.INT, Operator.GREATER_THAN, DataType.INT, DataType.INT);
         // int < int = int (representando booleano)
         this.setCubeValue(DataType.INT, Operator.LESS_THAN, DataType.INT, DataType.INT);
+        // int >= int = int (representando booleano)
+        this.setCubeValue(DataType.INT, Operator.GREATER_EQUALS, DataType.INT, DataType.INT);
+        // int <= int = int (representando booleano)
+        this.setCubeValue(DataType.INT, Operator.LESS_EQUALS, DataType.INT, DataType.INT);
+        // int == int = int (representando booleano)
+        this.setCubeValue(DataType.INT, Operator.EQUALS, DataType.INT, DataType.INT);
         // int != int = int (representando booleano)
         this.setCubeValue(DataType.INT, Operator.NOT_EQUALS, DataType.INT, DataType.INT);
         // int > float = int (representando booleano)
         this.setCubeValue(DataType.INT, Operator.GREATER_THAN, DataType.FLOAT, DataType.INT);
         // int < float = int (representando booleano)
         this.setCubeValue(DataType.INT, Operator.LESS_THAN, DataType.FLOAT, DataType.INT);
+        // int >= float = int (representando booleano)
+        this.setCubeValue(DataType.INT, Operator.GREATER_EQUALS, DataType.FLOAT, DataType.INT);
+        // int <= float = int (representando booleano)
+        this.setCubeValue(DataType.INT, Operator.LESS_EQUALS, DataType.FLOAT, DataType.INT);
+        // int == float = int (representando booleano)
+        this.setCubeValue(DataType.INT, Operator.EQUALS, DataType.FLOAT, DataType.INT);
         // int != float = int (representando booleano)
         this.setCubeValue(DataType.INT, Operator.NOT_EQUALS, DataType.FLOAT, DataType.INT);
         // float > int = int (representando booleano)
         this.setCubeValue(DataType.FLOAT, Operator.GREATER_THAN, DataType.INT, DataType.INT);
         // float < int = int (representando booleano)
         this.setCubeValue(DataType.FLOAT, Operator.LESS_THAN, DataType.INT, DataType.INT);
+        // float >= int = int (representando booleano)
+        this.setCubeValue(DataType.FLOAT, Operator.GREATER_EQUALS, DataType.INT, DataType.INT);
+        // float <= int = int (representando booleano)
+        this.setCubeValue(DataType.FLOAT, Operator.LESS_EQUALS, DataType.INT, DataType.INT);
+        // float == int = int (representando booleano)
+        this.setCubeValue(DataType.FLOAT, Operator.EQUALS, DataType.INT, DataType.INT);
         // float != int = int (representando booleano)
         this.setCubeValue(DataType.FLOAT, Operator.NOT_EQUALS, DataType.INT, DataType.INT);
         // float > float = int (representando booleano)
         this.setCubeValue(DataType.FLOAT, Operator.GREATER_THAN, DataType.FLOAT, DataType.INT);
         // float < float = int (representando booleano)
         this.setCubeValue(DataType.FLOAT, Operator.LESS_THAN, DataType.FLOAT, DataType.INT);
+        // float >= float = int (representando booleano)
+        this.setCubeValue(DataType.FLOAT, Operator.GREATER_EQUALS, DataType.FLOAT, DataType.INT);
+        // float <= float = int (representando booleano)
+        this.setCubeValue(DataType.FLOAT, Operator.LESS_EQUALS, DataType.FLOAT, DataType.INT);
+        // float == float = int (representando booleano)
+        this.setCubeValue(DataType.FLOAT, Operator.EQUALS, DataType.FLOAT, DataType.INT);
         // float != float = int (representando booleano)
         this.setCubeValue(DataType.FLOAT, Operator.NOT_EQUALS, DataType.FLOAT, DataType.INT);
         // Operaciones de asignación: =
@@ -110,6 +141,15 @@ class SemanticCube {
         this.setCubeValue(DataType.FLOAT, Operator.ASSIGN, DataType.INT, DataType.FLOAT);
         // float = float (válido)
         this.setCubeValue(DataType.FLOAT, Operator.ASSIGN, DataType.FLOAT, DataType.FLOAT);
+        // Operaciones lógicas: &&, ||, !
+        // int && int = int (representando booleano)
+        this.setCubeValue(DataType.INT, Operator.AND, DataType.INT, DataType.INT);
+        // int || int = int (representando booleano)
+        this.setCubeValue(DataType.INT, Operator.OR, DataType.INT, DataType.INT);
+        // Operaciones unarias (NOT)
+        // !int = int (representando booleano)
+        // Nota: Para operadores unarios, usamos el mismo tipo como operando izquierdo y derecho
+        this.setCubeValue(DataType.INT, Operator.NOT, DataType.INT, DataType.INT);
     }
     /**
      * Guarda el tipo que resulta de una operacion
@@ -147,3 +187,4 @@ class SemanticCube {
 exports.SemanticCube = SemanticCube;
 // Exportar un singleton
 exports.semanticCube = new SemanticCube();
+//# sourceMappingURL=semantic-cube.js.map

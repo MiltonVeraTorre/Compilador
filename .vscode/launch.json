@@ -1,0 +1,155 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Current TypeScript File",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/ts-node/dist/bin.js",
+      "args": ["${file}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "<node_internals>/**",
+        "${workspaceFolder}/node_modules/**"
+      ],
+      "env": {
+        "TS_NODE_PROJECT": "${workspaceFolder}/tsconfig.json",
+        "TS_NODE_COMPILER_OPTIONS": "{\"sourceMap\":true,\"inlineSourceMap\":false}"
+      },
+      "sourceMaps": true,
+      "restart": true,
+      "protocol": "inspector",
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js"
+      ]
+    },
+    {
+      "name": "Debug test.ts",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/ts-node/dist/bin.js",
+      "args": ["${workspaceFolder}/src/test.ts"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "<node_internals>/**",
+        "${workspaceFolder}/node_modules/**"
+      ],
+      "env": {
+        "TS_NODE_PROJECT": "${workspaceFolder}/tsconfig.json",
+        "TS_NODE_COMPILER_OPTIONS": "{\"sourceMap\":true,\"inlineSourceMap\":false}"
+      },
+      "sourceMaps": true,
+      "restart": true,
+      "protocol": "inspector",
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js"
+      ]
+    },
+    {
+      "name": "Debug Jest Tests",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest.js",
+      "args": [
+        "--runInBand",
+        "--no-cache",
+        "--no-coverage"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "sourceMaps": true,
+      "restart": true,
+      "protocol": "inspector"
+    },
+    {
+      "name": "Debug Jest Current File",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest.js",
+      "args": [
+        "--runInBand",
+        "--no-cache",
+        "--no-coverage",
+        "${fileBasenameNoExtension}"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "sourceMaps": true,
+      "restart": true,
+      "protocol": "inspector"
+    },
+    {
+      "name": "Debug Compiled JavaScript",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/dist/test.js",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "<node_internals>/**",
+        "${workspaceFolder}/node_modules/**"
+      ],
+      "sourceMaps": true,
+      "restart": true,
+      "protocol": "inspector",
+      "preLaunchTask": "tsc: build",
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js"
+      ]
+    },
+    {
+      "name": "Debug with ts-node (Alternative)",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register"
+      ],
+      "args": [
+        "${file}"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "<node_internals>/**",
+        "${workspaceFolder}/node_modules/**"
+      ],
+      "env": {
+        "TS_NODE_PROJECT": "${workspaceFolder}/tsconfig.json"
+      },
+      "sourceMaps": true,
+      "restart": true,
+      "protocol": "inspector",
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+    }
+  ]
+}

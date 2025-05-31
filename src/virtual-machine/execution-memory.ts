@@ -182,6 +182,14 @@ export class ExecutionMemory {
   }
 
   /**
+   * Obtiene todas las memorias
+   * @returns Todas las memorias
+   */
+  public getAllMemory(): any {
+    return JSON.stringify(this.getDebugInfo());
+  }
+
+  /**
    * Inicializa una constante en la memoria
    * @param address Dirección de la constante
    * @param value Valor de la constante

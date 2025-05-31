@@ -40,3 +40,4 @@ function parseInput(sourceCode) {
         quadruples: semantic_analyzer_1.semanticAnalyzer.getQuadruples() || []
     };
 }
+//# sourceMappingURL=index.js.map

@@ -93,3 +93,4 @@ class VariableTable {
     }
 }
 exports.VariableTable = VariableTable;
+//# sourceMappingURL=variable-table.js.map

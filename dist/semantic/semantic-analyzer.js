@@ -407,6 +407,121 @@ class SemanticAnalyzer {
         }
     }
     /**
+     * Procesa un estatuto de condición (if-else)
+     * @param conditionNode Nodo de condición
+     */
+    processCondition(conditionNode) {
+        // Procesar la expresión de la condición
+        this.processExpression(conditionNode.children.expression[0]);
+        const conditionType = this.currentType;
+        // Verificar que la condición sea de tipo entero (booleano)
+        if (conditionType !== semantic_cube_1.DataType.INT) {
+            this.addError(`La condición debe ser de tipo entero (booleano), no ${conditionType}`, conditionNode.children.expression[0]);
+        }
+        // Generar el cuádruplo GOTOF (salto si falso)
+        const gotofIndex = quadruples_1.quadrupleGenerator.generateGotofQuadruple();
+        // Procesar el cuerpo del if
+        this.processBody(conditionNode.children.body[0]);
+        // Si hay un else
+        if (conditionNode.children.Else) {
+            // Generar un GOTO para saltar el else después de ejecutar el if
+            const gotoIndex = quadruples_1.quadrupleGenerator.generateGotoQuadruple();
+            // Completar el GOTOF para saltar al else si la condición es falsa
+            quadruples_1.quadrupleGenerator.fillJump(gotofIndex, quadruples_1.quadrupleGenerator.getNextQuadIndex());
+            // Procesar el cuerpo del else
+            this.processBody(conditionNode.children.body[1]);
+            // Completar el GOTO para saltar después del else
+            quadruples_1.quadrupleGenerator.fillJump(gotoIndex, quadruples_1.quadrupleGenerator.getNextQuadIndex());
+        }
+        else {
+            // Si no hay else, completar el GOTOF para saltar después del if
+            quadruples_1.quadrupleGenerator.fillJump(gotofIndex, quadruples_1.quadrupleGenerator.getNextQuadIndex());
+        }
+    }
+    /**
+     * Procesa un estatuto de ciclo (while)
+     * @param cycleNode Nodo de ciclo
+     */
+    processCycle(cycleNode) {
+        // Guardar el índice de inicio del ciclo
+        const startIndex = quadruples_1.quadrupleGenerator.getNextQuadIndex();
+        // Procesar la expresión de la condición
+        this.processExpression(cycleNode.children.expression[0]);
+        const conditionType = this.currentType;
+        // Verificar que la condición sea de tipo entero (booleano)
+        if (conditionType !== semantic_cube_1.DataType.INT) {
+            this.addError(`La condición debe ser de tipo entero (booleano), no ${conditionType}`, cycleNode.children.expression[0]);
+        }
+        // Generar el cuádruplo GOTOF (salto si falso)
+        const gotofIndex = quadruples_1.quadrupleGenerator.generateGotofQuadruple();
+        // Procesar el cuerpo del ciclo
+        this.processBody(cycleNode.children.body[0]);
+        // Generar el cuádruplo GOTO para volver al inicio del ciclo
+        const gotoIndex = quadruples_1.quadrupleGenerator.generateGotoQuadruple();
+        quadruples_1.quadrupleGenerator.fillJump(gotoIndex, startIndex);
+        // Completar el GOTOF para saltar después del ciclo si la condición es falsa
+        quadruples_1.quadrupleGenerator.fillJump(gotofIndex, quadruples_1.quadrupleGenerator.getNextQuadIndex());
+    }
+    /**
+     * Procesa un cuerpo (bloque de código)
+     * @param bodyNode Nodo de cuerpo
+     */
+    processBody(bodyNode) {
+        // Procesar cada estatuto en el cuerpo
+        if (bodyNode.children.statement) {
+            for (const statementNode of bodyNode.children.statement) {
+                this.processStatement(statementNode);
+            }
+        }
+    }
+    /**
+     * Procesa un estatuto
+     * @param statementNode Nodo de estatuto
+     */
+    processStatement(statementNode) {
+        // Procesar asignación
+        if (statementNode.children.assign && statementNode.children.assign.length > 0) {
+            this.processAssign(statementNode.children.assign[0]);
+        }
+        // Procesar condición
+        if (statementNode.children.condition && statementNode.children.condition.length > 0) {
+            this.processCondition(statementNode.children.condition[0]);
+        }
+        // Procesar ciclo
+        if (statementNode.children.cycle && statementNode.children.cycle.length > 0) {
+            this.processCycle(statementNode.children.cycle[0]);
+        }
+        // Procesar llamada a función
+        if (statementNode.children.f_call && statementNode.children.f_call.length > 0) {
+            this.processFunctionCall(statementNode.children.f_call[0]);
+        }
+        // Procesar print
+        if (statementNode.children.print && statementNode.children.print.length > 0) {
+            this.processPrint(statementNode.children.print[0]);
+        }
+    }
+    /**
+     * Procesa un estatuto de impresión
+     * @param printNode Nodo de print
+     */
+    processPrint(printNode) {
+        // Si hay una expresión, procesarla
+        if (printNode.children.expression && printNode.children.expression.length > 0) {
+            this.processExpression(printNode.children.expression[0]);
+            // Generar el cuádruplo para imprimir
+            quadruples_1.quadrupleGenerator.generatePrintQuadruple();
+        }
+        // Si hay una cadena literal, procesarla
+        if (printNode.children.CteString && printNode.children.CteString.length > 0) {
+            const stringToken = printNode.children.CteString[0];
+            const stringValue = stringToken.image;
+            // Agregar la cadena como operando
+            quadruples_1.quadrupleGenerator.pushOperand(stringValue, semantic_cube_1.DataType.STRING);
+            // Generar el cuádruplo para imprimir
+            quadruples_1.quadrupleGenerator.generatePrintQuadruple();
+        }
+    }
+    /**
      * Procesa argumentos
      * @param argListNode Nodo de argumentos
      * @param parameters Lista de parametros esperados
@@ -468,3 +583,4 @@ class SemanticAnalyzer {
 exports.SemanticAnalyzer = SemanticAnalyzer;
 // Exportar un singleton
 exports.semanticAnalyzer = new SemanticAnalyzer();
+//# sourceMappingURL=semantic-analyzer.js.map

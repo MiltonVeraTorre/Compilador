@@ -34,3 +34,4 @@ else {
         console.log(`${index}: ${(0, quadruples_1.quadrupleToString)(quad)}`);
     });
 }
+//# sourceMappingURL=example.js.map

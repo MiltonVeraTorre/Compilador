@@ -22,3 +22,4 @@ class BabyDuckLexer {
 exports.BabyDuckLexer = BabyDuckLexer;
 // Crear y exportar una instancia singleton del analizador léxico
 exports.babyDuckLexer = new BabyDuckLexer();
+//# sourceMappingURL=lexer.js.map
