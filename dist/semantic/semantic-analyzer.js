@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.semanticAnalyzer = exports.SemanticAnalyzer = void 0;
-const semantic_cube_1 = require("./semantic-cube");
-const function_directory_1 = require("./function-directory");
 const quadruples_1 = require("../quadruples");
+const function_directory_1 = require("./function-directory");
+const semantic_cube_1 = require("./semantic-cube");
 /**
  * Analizador Semantico - Hace validaciones semanticas
  *
@@ -32,6 +32,32 @@ class SemanticAnalyzer {
      */
     getQuadruples() {
         return quadruples_1.quadrupleGenerator.getQuadruples();
+    }
+    /**
+     * Registra la dirección de inicio de una función
+     * @param functionName Nombre de la función
+     * @param address Dirección de inicio
+     */
+    setFunctionAddress(functionName, address) {
+        quadruples_1.quadrupleGenerator.setFunctionAddress(functionName, address);
+    }
+    /**
+     * Resuelve todos los cuádruplos GOSUB pendientes
+     */
+    resolvePendingGosubs() {
+        quadruples_1.quadrupleGenerator.resolvePendingGosubs();
+    }
+    /**
+     * Genera un cuádruplo ENDPROC para marcar el final de una función
+     */
+    generateEndprocQuadruple() {
+        quadruples_1.quadrupleGenerator.generateEndprocQuadruple();
+    }
+    /**
+     * Genera un cuádruplo HALT para terminar el programa
+     */
+    generateHaltQuadruple() {
+        quadruples_1.quadrupleGenerator.generateHaltQuadruple();
     }
     /**
      * Procesa las variables
@@ -157,6 +183,9 @@ class SemanticAnalyzer {
         const operators = [
             expressionNode.children.GreaterThan,
             expressionNode.children.LessThan,
+            expressionNode.children.GreaterEquals,
+            expressionNode.children.LessEquals,
+            expressionNode.children.EqualsEquals,
             expressionNode.children.NotEquals
         ];
         const operator = operators.find(op => op && op.length > 0);
@@ -398,13 +427,22 @@ class SemanticAnalyzer {
             this.addError(`Función no declarada: ${funcName}`, idToken);
             return;
         }
-        // Verificar argumentos
+        // PRIMERO: Procesar argumentos (evaluar expresiones ANTES de crear el contexto)
         if (fCallNode.children.argList && fCallNode.children.argList.length > 0) {
             this.processArgList(fCallNode.children.argList[0], func.parameters);
         }
         else if (func.parameters.length > 0) {
             this.addError(`Faltan argumentos en la llamada a la función: ${funcName}`, idToken);
+            return;
         }
+        // SEGUNDO: Generar cuádruplo ERA (Espacio de Activación)
+        quadruples_1.quadrupleGenerator.generateEraQuadruple(funcName);
+        // TERCERO: Generar cuádruplos PARAM (los valores ya están evaluados)
+        if (fCallNode.children.argList && fCallNode.children.argList.length > 0) {
+            this.generateParamQuadruples(func.parameters.length);
+        }
+        // CUARTO: Generar cuádruplo GOSUB (llamada a la función)
+        quadruples_1.quadrupleGenerator.generateGosubQuadruple(funcName);
     }
     /**
      * Procesa un estatuto de condición (if-else)
@@ -512,9 +550,13 @@ class SemanticAnalyzer {
             quadruples_1.quadrupleGenerator.generatePrintQuadruple();
         }
         // Si hay una cadena literal, procesarla
-        if (printNode.children.CteString && printNode.children.CteString.length > 0) {
+        else if (printNode.children.CteString && printNode.children.CteString.length > 0) {
             const stringToken = printNode.children.CteString[0];
-            const stringValue = stringToken.image;
+            let stringValue = stringToken.image;
+            // Remover las comillas de la cadena
+            if (stringValue.startsWith('"') && stringValue.endsWith('"')) {
+                stringValue = stringValue.slice(1, -1);
+            }
             // Agregar la cadena como operando
             quadruples_1.quadrupleGenerator.pushOperand(stringValue, semantic_cube_1.DataType.STRING);
             // Generar el cuádruplo para imprimir
@@ -522,7 +564,7 @@ class SemanticAnalyzer {
         }
     }
     /**
-     * Procesa argumentos
+     * Procesa argumentos (solo evalúa expresiones, no genera cuádruplos PARAM)
      * @param argListNode Nodo de argumentos
      * @param parameters Lista de parametros esperados
      */
@@ -536,7 +578,7 @@ class SemanticAnalyzer {
             this.addError(`Número incorrecto de argumentos: esperados ${parameters.length}, recibidos ${expressions.length}`, argListNode);
             return;
         }
-        // Verificar tipo de cada argumento
+        // Verificar tipo de cada argumento (solo evaluar expresiones)
         for (let i = 0; i < expressions.length; i++) {
             this.processExpression(expressions[i]);
             const argType = this.currentType;
@@ -549,6 +591,17 @@ class SemanticAnalyzer {
             if (!isValid) {
                 this.addError(`Tipo incompatible en argumento ${i + 1}: esperado ${paramType}, recibido ${argType}`, expressions[i]);
             }
+            // NO generar cuádruplos PARAM aquí - se harán después del ERA
+        }
+    }
+    /**
+     * Genera cuádruplos PARAM para los argumentos ya evaluados
+     * @param paramCount Número de parámetros
+     */
+    generateParamQuadruples(paramCount) {
+        // Generar cuádruplos PARAM en orden inverso (porque están en la pila)
+        for (let i = paramCount - 1; i >= 0; i--) {
+            quadruples_1.quadrupleGenerator.generateParamQuadruple(i);
         }
     }
     /**

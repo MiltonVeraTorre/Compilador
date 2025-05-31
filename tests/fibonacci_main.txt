@@ -1,0 +1,29 @@
+program fibonacci;
+var
+  n: int;
+  a: int;
+  b: int;
+  temp: int;
+  contador: int;
+
+main {
+  n = 10;
+  a = 0;
+  b = 1;
+  contador = 2;
+  
+  print("Serie de Fibonacci:");
+  print(a);
+  print(b);
+  
+  while (contador < n) do {
+    temp = a + b;
+    print(temp);
+    a = b;
+    b = temp;
+    contador = contador + 1;
+  };
+  
+  print("Fibonacci completado");
+}
+end

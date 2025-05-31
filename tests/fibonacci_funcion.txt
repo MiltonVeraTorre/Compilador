@@ -1,0 +1,38 @@
+program fibonacci_funcion;
+var
+  n: int;
+  resultado: int;
+
+void fibonacci(limite: int) [
+  var
+    a: int;
+    b: int;
+    temp: int;
+    contador: int;
+  {
+    a = 0;
+    b = 1;
+    contador = 2;
+    
+    print("Serie de Fibonacci:");
+    print(a);
+    print(b);
+    
+    while (contador < limite) do {
+      temp = a + b;
+      print(temp);
+      a = b;
+      b = temp;
+      contador = contador + 1;
+    };
+  }
+];
+
+main {
+  n = 8;
+  print("Calculando Fibonacci hasta:");
+  print(n);
+  fibonacci(n);
+  print("Fibonacci con funcion completado");
+}
+end

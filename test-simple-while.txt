@@ -1,0 +1,16 @@
+program test_simple;
+var
+  contador: int;
+
+main {
+  contador = 1;
+  
+  while (contador <= 3) do {
+    print("Contador:");
+    print(contador);
+    contador = contador + 1;
+  };
+  
+  print("Terminado");
+}
+end

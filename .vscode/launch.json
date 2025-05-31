@@ -58,6 +58,34 @@
       ]
     },
     {
+      "name": "Debug compiler.ts",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/ts-node/dist/bin.js",
+      "args": ["${workspaceFolder}/src/compiler.ts"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "<node_internals>/**",
+        "${workspaceFolder}/node_modules/**"
+      ],
+      "env": {
+        "TS_NODE_PROJECT": "${workspaceFolder}/tsconfig.json",
+        "TS_NODE_COMPILER_OPTIONS": "{\"sourceMap\":true,\"inlineSourceMap\":false}"
+      },
+      "sourceMaps": true,
+      "restart": true,
+      "protocol": "inspector",
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js"
+      ]
+    },
+    {
       "name": "Debug Jest Tests",
       "type": "node",
       "request": "launch",

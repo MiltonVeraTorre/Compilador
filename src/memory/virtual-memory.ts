@@ -8,6 +8,7 @@ import { DataType } from '../semantic/semantic-cube';
 export enum MemorySegment {
   GLOBAL = 'global',     // Variables globales
   LOCAL = 'local',       // Variables locales
+  PARAMETER = 'parameter', // Parámetros de funciones
   TEMPORAL = 'temporal', // Variables temporales
   CONSTANT = 'constant'  // Constantes
 }
@@ -29,11 +30,18 @@ export const MEMORY_RANGES: {
     [DataType.STRING]: { start: 3000, end: 3999 }
   },
 
-  // Variables locales: 5000-8999
+  // Variables locales: 5100-8999
   [MemorySegment.LOCAL]: {
-    [DataType.INT]: { start: 5000, end: 5999 },
+    [DataType.INT]: { start: 5100, end: 5999 },
     [DataType.FLOAT]: { start: 6000, end: 6999 },
     [DataType.STRING]: { start: 7000, end: 7999 }
+  },
+
+  // Parámetros de funciones: 5000-5099
+  [MemorySegment.PARAMETER]: {
+    [DataType.INT]: { start: 5000, end: 5099 },
+    [DataType.FLOAT]: { start: 5000, end: 5099 },
+    [DataType.STRING]: { start: 5000, end: 5099 }
   },
 
   // Variables temporales: 9000-12999
@@ -77,9 +85,14 @@ export class VirtualMemory {
         [DataType.STRING]: MEMORY_RANGES[MemorySegment.GLOBAL][DataType.STRING]?.start || 3000
       },
       [MemorySegment.LOCAL]: {
-        [DataType.INT]: MEMORY_RANGES[MemorySegment.LOCAL][DataType.INT]?.start || 5000,
+        [DataType.INT]: MEMORY_RANGES[MemorySegment.LOCAL][DataType.INT]?.start || 5100,
         [DataType.FLOAT]: MEMORY_RANGES[MemorySegment.LOCAL][DataType.FLOAT]?.start || 6000,
         [DataType.STRING]: MEMORY_RANGES[MemorySegment.LOCAL][DataType.STRING]?.start || 7000
+      },
+      [MemorySegment.PARAMETER]: {
+        [DataType.INT]: MEMORY_RANGES[MemorySegment.PARAMETER][DataType.INT]?.start || 5000,
+        [DataType.FLOAT]: MEMORY_RANGES[MemorySegment.PARAMETER][DataType.FLOAT]?.start || 5000,
+        [DataType.STRING]: MEMORY_RANGES[MemorySegment.PARAMETER][DataType.STRING]?.start || 5000
       },
       [MemorySegment.TEMPORAL]: {
         [DataType.INT]: MEMORY_RANGES[MemorySegment.TEMPORAL][DataType.INT]?.start || 9000,

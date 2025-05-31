@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.babyDuckParser = exports.BabyDuckParser = void 0;
-const grammar_1 = require("./grammar");
-const semantic_analyzer_1 = require("../semantic/semantic-analyzer");
 const function_directory_1 = require("../semantic/function-directory");
+const semantic_analyzer_1 = require("../semantic/semantic-analyzer");
+const grammar_1 = require("./grammar");
 /**
  * Analizador sintactico de BabyDuck - Analiza tokens en un Arbol de Sintaxis Concreto y realiza analisis semántico
  */
@@ -52,7 +52,7 @@ class BabyDuckParser {
         if (programNode.children.vars && programNode.children.vars.length > 0) {
             semantic_analyzer_1.semanticAnalyzer.processVars(programNode.children.vars[0]);
         }
-        // Procesar declaraciones de funciones
+        // PASO 1: Declarar todas las funciones (sin procesar sus cuerpos)
         if (programNode.children.func && programNode.children.func.length > 0) {
             for (const funcNode of programNode.children.func) {
                 semantic_analyzer_1.semanticAnalyzer.processFunc(funcNode);
@@ -60,18 +60,37 @@ class BabyDuckParser {
                 if (funcNode.children.vars && funcNode.children.vars.length > 0) {
                     semantic_analyzer_1.semanticAnalyzer.processVars(funcNode.children.vars[0]);
                 }
-                // Procesar el cuerpo de la función
-                if (funcNode.children.body && funcNode.children.body.length > 0) {
-                    this.processBody(funcNode.children.body[0]);
-                }
+                // NO procesamos el cuerpo de la función aquí
             }
         }
-        // Establecer el ambito global para el cuerpo principal
+        // PASO 2: Establecer el ambito global y procesar el cuerpo principal
         function_directory_1.functionDirectory.setCurrentFunction('global');
         // Procesar el cuerpo principal
         if (programNode.children.body && programNode.children.body.length > 0) {
             this.processBody(programNode.children.body[0]);
         }
+        // Generar cuádruplo HALT al final del main
+        semantic_analyzer_1.semanticAnalyzer.generateHaltQuadruple();
+        // PASO 3: Procesar los cuerpos de las funciones
+        if (programNode.children.func && programNode.children.func.length > 0) {
+            for (const funcNode of programNode.children.func) {
+                const idToken = funcNode.children.Identifier[0];
+                const funcName = idToken.image;
+                // Registrar la dirección de inicio de la función
+                const functionStartAddress = semantic_analyzer_1.semanticAnalyzer.getQuadruples().length;
+                semantic_analyzer_1.semanticAnalyzer.setFunctionAddress(funcName, functionStartAddress);
+                // Cambiar al contexto de la función
+                function_directory_1.functionDirectory.setCurrentFunction(funcName);
+                // Procesar el cuerpo de la función
+                if (funcNode.children.body && funcNode.children.body.length > 0) {
+                    this.processBody(funcNode.children.body[0]);
+                }
+                // Generar cuádruplo ENDPROC al final de la función
+                semantic_analyzer_1.semanticAnalyzer.generateEndprocQuadruple();
+            }
+        }
+        // PASO 4: Resolver todos los GOSUB pendientes
+        semantic_analyzer_1.semanticAnalyzer.resolvePendingGosubs();
     }
     /**
      * Procesa el cuerpo de una función o del programa principal

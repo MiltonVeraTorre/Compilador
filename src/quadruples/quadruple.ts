@@ -1,5 +1,5 @@
-import { Operator, DataType } from '../semantic/semantic-cube';
 import { virtualMemory } from '../memory/virtual-memory';
+import { DataType, Operator } from '../semantic/semantic-cube';
 
 /**
  * Operadores adicionales para cuádruplos
@@ -34,6 +34,7 @@ export enum QuadrupleOperator {
   PARAM = 'param',
   ERA = 'era', // espacio de activación
   ENDPROC = 'endproc',
+  HALT = 'halt', // terminar programa
 }
 
 /**

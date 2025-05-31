@@ -2,7 +2,7 @@ import { CstNode, IToken } from "chevrotain";
 
 /**
  * Interfaces para los nodos del Árbol de Sintaxis Concreto
- * 
+ *
  * Estas interfaces definen la estructura de los nodos CST generados por el parser
  */
 
@@ -142,6 +142,9 @@ export interface ExpressionCstNode extends BabyDuckCstNode {
     exp: ExpCstNode[];
     GreaterThan?: IToken[];
     LessThan?: IToken[];
+    GreaterEquals?: IToken[];
+    LessEquals?: IToken[];
+    EqualsEquals?: IToken[];
     NotEquals?: IToken[];
   };
 }

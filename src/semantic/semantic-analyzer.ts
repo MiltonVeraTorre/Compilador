@@ -1,32 +1,31 @@
 import { IToken } from "chevrotain";
-import { DataType, Operator, semanticCube } from './semantic-cube';
-import { functionDirectory } from './function-directory';
-import { Variable } from './variable-table';
 import {
-  VarsCstNode,
-  TypeCstNode,
+  ArgListCstNode,
+  AssignCstNode,
+  BabyDuckCstNode,
+  BodyCstNode,
+  ConditionCstNode,
+  CteCstNode,
+  CycleCstNode,
+  ExpCstNode,
+  ExpressionCstNode,
+  FactorCstNode,
+  FCallCstNode,
   FuncCstNode,
   ParamListCstNode,
-  AssignCstNode,
-  ExpressionCstNode,
-  ExpCstNode,
-  TermCstNode,
-  FactorCstNode,
-  CteCstNode,
-  FCallCstNode,
-  ArgListCstNode,
-  BabyDuckCstNode,
-  ConditionCstNode,
-  CycleCstNode,
-  BodyCstNode,
   PrintCstNode,
-  StatementCstNode
+  StatementCstNode,
+  TermCstNode,
+  TypeCstNode,
+  VarsCstNode
 } from '../parser/cst-types';
 import {
   quadrupleGenerator,
-  QuadrupleOperator,
   resetTempCounter
 } from '../quadruples';
+import { functionDirectory } from './function-directory';
+import { DataType, Operator, semanticCube } from './semantic-cube';
+import { Variable } from './variable-table';
 
 /**
  * Interfaz para errores semanticos
@@ -72,6 +71,36 @@ export class SemanticAnalyzer {
    */
   public getQuadruples() {
     return quadrupleGenerator.getQuadruples();
+  }
+
+  /**
+   * Registra la dirección de inicio de una función
+   * @param functionName Nombre de la función
+   * @param address Dirección de inicio
+   */
+  public setFunctionAddress(functionName: string, address: number): void {
+    quadrupleGenerator.setFunctionAddress(functionName, address);
+  }
+
+  /**
+   * Resuelve todos los cuádruplos GOSUB pendientes
+   */
+  public resolvePendingGosubs(): void {
+    quadrupleGenerator.resolvePendingGosubs();
+  }
+
+  /**
+   * Genera un cuádruplo ENDPROC para marcar el final de una función
+   */
+  public generateEndprocQuadruple(): void {
+    quadrupleGenerator.generateEndprocQuadruple();
+  }
+
+  /**
+   * Genera un cuádruplo HALT para terminar el programa
+   */
+  public generateHaltQuadruple(): void {
+    quadrupleGenerator.generateHaltQuadruple();
   }
 
   /**
@@ -235,6 +264,9 @@ export class SemanticAnalyzer {
     const operators = [
       expressionNode.children.GreaterThan,
       expressionNode.children.LessThan,
+      expressionNode.children.GreaterEquals,
+      expressionNode.children.LessEquals,
+      expressionNode.children.EqualsEquals,
       expressionNode.children.NotEquals
     ];
 
@@ -296,7 +328,7 @@ export class SemanticAnalyzer {
     const terms = expNode.children.term;
 
     if ((plusOperators && plusOperators.length > 0) ||
-        (minusOperators && minusOperators.length > 0)) {
+      (minusOperators && minusOperators.length > 0)) {
 
       // Procesar cada operador y término
       let currentType = leftType;
@@ -307,7 +339,7 @@ export class SemanticAnalyzer {
         let opToken: IToken;
 
         if (plusOperators && opIndex < plusOperators.length &&
-            (!minusOperators || plusOperators[opIndex].startOffset < minusOperators[opIndex].startOffset)) {
+          (!minusOperators || plusOperators[opIndex].startOffset < minusOperators[opIndex].startOffset)) {
           operator = Operator.PLUS;
           opToken = plusOperators[opIndex];
           opIndex++;
@@ -374,7 +406,7 @@ export class SemanticAnalyzer {
     const factors = termNode.children.factor;
 
     if ((multiplyOperators && multiplyOperators.length > 0) ||
-        (divideOperators && divideOperators.length > 0)) {
+      (divideOperators && divideOperators.length > 0)) {
 
       // Procesar cada operador y factor
       let currentType = leftType;
@@ -385,7 +417,7 @@ export class SemanticAnalyzer {
         let opToken: IToken;
 
         if (multiplyOperators && opIndex < multiplyOperators.length &&
-            (!divideOperators || multiplyOperators[opIndex].startOffset < divideOperators[opIndex].startOffset)) {
+          (!divideOperators || multiplyOperators[opIndex].startOffset < divideOperators[opIndex].startOffset)) {
           operator = Operator.MULTIPLY;
           opToken = multiplyOperators[opIndex];
           opIndex++;
@@ -537,7 +569,7 @@ export class SemanticAnalyzer {
       return;
     }
 
-    // Verificar argumentos
+    // PRIMERO: Procesar argumentos (evaluar expresiones ANTES de crear el contexto)
     if (fCallNode.children.argList && fCallNode.children.argList.length > 0) {
       this.processArgList(fCallNode.children.argList[0], func.parameters);
     } else if (func.parameters.length > 0) {
@@ -545,7 +577,19 @@ export class SemanticAnalyzer {
         `Faltan argumentos en la llamada a la función: ${funcName}`,
         idToken
       );
+      return;
     }
+
+    // SEGUNDO: Generar cuádruplo ERA (Espacio de Activación)
+    quadrupleGenerator.generateEraQuadruple(funcName);
+
+    // TERCERO: Generar cuádruplos PARAM (los valores ya están evaluados)
+    if (fCallNode.children.argList && fCallNode.children.argList.length > 0) {
+      this.generateParamQuadruples(func.parameters.length);
+    }
+
+    // CUARTO: Generar cuádruplo GOSUB (llamada a la función)
+    quadrupleGenerator.generateGosubQuadruple(funcName);
   }
 
   /**
@@ -680,11 +724,15 @@ export class SemanticAnalyzer {
       // Generar el cuádruplo para imprimir
       quadrupleGenerator.generatePrintQuadruple();
     }
-
     // Si hay una cadena literal, procesarla
-    if (printNode.children.CteString && printNode.children.CteString.length > 0) {
+    else if (printNode.children.CteString && printNode.children.CteString.length > 0) {
       const stringToken = printNode.children.CteString[0];
-      const stringValue = stringToken.image;
+      let stringValue = stringToken.image;
+
+      // Remover las comillas de la cadena
+      if (stringValue.startsWith('"') && stringValue.endsWith('"')) {
+        stringValue = stringValue.slice(1, -1);
+      }
 
       // Agregar la cadena como operando
       quadrupleGenerator.pushOperand(stringValue, DataType.STRING);
@@ -695,7 +743,7 @@ export class SemanticAnalyzer {
   }
 
   /**
-   * Procesa argumentos
+   * Procesa argumentos (solo evalúa expresiones, no genera cuádruplos PARAM)
    * @param argListNode Nodo de argumentos
    * @param parameters Lista de parametros esperados
    */
@@ -715,7 +763,7 @@ export class SemanticAnalyzer {
       return;
     }
 
-    // Verificar tipo de cada argumento
+    // Verificar tipo de cada argumento (solo evaluar expresiones)
     for (let i = 0; i < expressions.length; i++) {
       this.processExpression(expressions[i]);
       const argType = this.currentType;
@@ -739,6 +787,18 @@ export class SemanticAnalyzer {
           expressions[i]
         );
       }
+      // NO generar cuádruplos PARAM aquí - se harán después del ERA
+    }
+  }
+
+  /**
+   * Genera cuádruplos PARAM para los argumentos ya evaluados
+   * @param paramCount Número de parámetros
+   */
+  public generateParamQuadruples(paramCount: number) {
+    // Generar cuádruplos PARAM en orden inverso (porque están en la pila)
+    for (let i = paramCount - 1; i >= 0; i--) {
+      quadrupleGenerator.generateParamQuadruple(i);
     }
   }
 

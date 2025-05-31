@@ -1,0 +1,17 @@
+program test_func;
+var
+  numero: int;
+
+void imprimir_numero(valor: int) [
+  {
+    print("El valor es:");
+    print(valor);
+  }
+];
+
+main {
+  numero = 42;
+  imprimir_numero(numero);
+  print("Terminado");
+}
+end

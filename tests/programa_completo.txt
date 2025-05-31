@@ -1,0 +1,108 @@
+program prog_completo;
+var
+  opcion: int;
+  numero1: int;
+  numero2: int;
+
+void menu() [
+  {
+    print("=== MENU DE OPCIONES ===");
+    print("1. Calcular factorial");
+    print("2. Serie Fibonacci");
+    print("3. Suma de numeros");
+    print("4. Salir");
+  }
+];
+
+void factorial_recursivo(n: int) [
+  var
+    resultado: int;
+    contador: int;
+  {
+    if (n <= 1) {
+      print("Factorial es: 1");
+    } else {
+      resultado = 1;
+      contador = 1;
+      
+      while (contador <= n) do {
+        resultado = resultado * contador;
+        contador = contador + 1;
+      };
+      
+      print("Factorial de");
+      print(n);
+      print("es:");
+      print(resultado);
+    };
+  }
+];
+
+void fibonacci_serie(terminos: int) [
+  var
+    a: int;
+    b: int;
+    temp: int;
+    contador: int;
+  {
+    if (terminos >= 1) {
+      a = 0;
+      print(a);
+    };
+    
+    if (terminos >= 2) {
+      b = 1;
+      print(b);
+      contador = 2;
+      
+      while (contador < terminos) do {
+        temp = a + b;
+        print(temp);
+        a = b;
+        b = temp;
+        contador = contador + 1;
+      };
+    };
+  }
+];
+
+void sumar_rango(inicio: int, fin: int) [
+  var
+    suma: int;
+    actual: int;
+  {
+    suma = 0;
+    actual = inicio;
+    
+    print("Sumando desde");
+    print(inicio);
+    print("hasta");
+    print(fin);
+    
+    while (actual <= fin) do {
+      suma = suma + actual;
+      actual = actual + 1;
+    };
+    
+    print("La suma es:");
+    print(suma);
+  }
+];
+
+main {
+  print("Programa de demostracion completo");
+  
+  menu();
+  
+  print("Ejecutando factorial de 5:");
+  factorial_recursivo(5);
+  
+  print("Ejecutando Fibonacci con 8 terminos:");
+  fibonacci_serie(8);
+  
+  print("Ejecutando suma del 1 al 20:");
+  sumar_rango(1, 20);
+  
+  print("Programa completado exitosamente");
+}
+end

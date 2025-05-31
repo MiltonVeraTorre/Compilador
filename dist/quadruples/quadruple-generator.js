@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.quadrupleGenerator = exports.QuadrupleGenerator = void 0;
-const stack_1 = require("./stack");
-const queue_1 = require("./queue");
-const quadruple_1 = require("./quadruple");
-const semantic_cube_1 = require("../semantic/semantic-cube");
-const function_directory_1 = require("../semantic/function-directory");
 const virtual_memory_1 = require("../memory/virtual-memory");
+const function_directory_1 = require("../semantic/function-directory");
+const semantic_cube_1 = require("../semantic/semantic-cube");
+const quadruple_1 = require("./quadruple");
+const queue_1 = require("./queue");
+const stack_1 = require("./stack");
 /**
  * Generador de Cuádruplos
  *
@@ -25,6 +25,9 @@ class QuadrupleGenerator {
         this.parameterStack = new stack_1.Stack();
         this.callStack = new stack_1.Stack();
         this.returnStack = new stack_1.Stack();
+        // Inicializar mapas y listas para funciones
+        this.functionAddresses = new Map();
+        this.pendingGosubs = [];
     }
     /**
      * Agrega un operando a la pila
@@ -35,41 +38,45 @@ class QuadrupleGenerator {
         // Convertir el operando a dirección virtual
         let address;
         if (typeof operand === 'string') {
-            // Si es una variable, buscar su dirección o asignar una nueva
-            if (this.addressMap.has(operand)) {
-                address = this.addressMap.get(operand);
+            // Verificar si es una cadena literal (no es una variable)
+            const variable = function_directory_1.functionDirectory.lookupVariable(operand);
+            if (!variable) {
+                // Es una cadena literal, asignar dirección de constante
+                address = virtual_memory_1.virtualMemory.assignConstantAddress(operand, type);
             }
             else {
-                // Buscar la variable en el directorio de funciones
-                const variable = function_directory_1.functionDirectory.lookupVariable(operand);
-                if (variable && variable.address !== undefined) {
-                    // Si la variable ya tiene dirección, usarla
-                    address = variable.address;
-                    this.addressMap.set(operand, address);
+                // Es una variable, manejar como antes
+                if (this.addressMap.has(operand)) {
+                    address = this.addressMap.get(operand);
                 }
                 else {
-                    // Si es una variable temporal (empieza con t)
-                    if (operand.startsWith('t')) {
-                        address = virtual_memory_1.virtualMemory.assignTempAddress(type);
+                    if (variable.address !== undefined) {
+                        // Si la variable ya tiene dirección, usarla
+                        address = variable.address;
+                        this.addressMap.set(operand, address);
                     }
                     else {
-                        // Determinar si es global o local
-                        const currentFunction = function_directory_1.functionDirectory.getCurrentFunction();
-                        const isGlobal = currentFunction === 'global';
-                        // Asignar dirección según el segmento
-                        address = virtual_memory_1.virtualMemory.assignAddress(type, isGlobal ? virtual_memory_1.MemorySegment.GLOBAL : virtual_memory_1.MemorySegment.LOCAL);
-                        // Guardar la dirección en la variable
-                        if (variable) {
+                        // Si es una variable temporal (empieza con t)
+                        if (operand.startsWith('t')) {
+                            address = virtual_memory_1.virtualMemory.assignTempAddress(type);
+                        }
+                        else {
+                            // Determinar si es global o local
+                            const currentFunction = function_directory_1.functionDirectory.getCurrentFunction();
+                            const isGlobal = currentFunction === 'global';
+                            // Asignar dirección según el segmento
+                            address = virtual_memory_1.virtualMemory.assignAddress(type, isGlobal ? virtual_memory_1.MemorySegment.GLOBAL : virtual_memory_1.MemorySegment.LOCAL);
+                            // Guardar la dirección en la variable
                             function_directory_1.functionDirectory.setVariableAddress(operand, address);
                         }
+                        // Guardar en el mapa
+                        this.addressMap.set(operand, address);
                     }
-                    // Guardar en el mapa
-                    this.addressMap.set(operand, address);
                 }
             }
         }
         else {
-            // Si es un valor literal, asignar dirección de constante
+            // Si es un valor literal numérico, asignar dirección de constante
             address = virtual_memory_1.virtualMemory.assignConstantAddress(operand, type);
         }
         this.operandStack.push(address);
@@ -292,9 +299,6 @@ class QuadrupleGenerator {
         if (!func) {
             throw new Error(`Error: función '${functionName}' no encontrada`);
         }
-        // Obtener la dirección de inicio de la función
-        // (esto se llenará después cuando se procese la función)
-        const functionStartAddress = this.getNextQuadIndex() + 1;
         // Si la función retorna un valor, asignar dirección temporal
         let returnAddress = null;
         if (func.type !== semantic_cube_1.DataType.VOID) {
@@ -303,10 +307,14 @@ class QuadrupleGenerator {
             this.operandStack.push(returnAddress);
             this.typeStack.push(func.type);
         }
-        // Crear cuádruplo GOSUB con la dirección de resultado
-        const quadruple = (0, quadruple_1.createQuadruple)(quadruple_1.QuadrupleOperator.GOSUB, functionStartAddress, null, returnAddress // Aquí va la dirección donde guardar el resultado
+        // Crear cuádruplo GOSUB con dirección temporal (se resolverá después)
+        const quadruple = (0, quadruple_1.createQuadruple)(quadruple_1.QuadrupleOperator.GOSUB, -1, // Dirección temporal, se resolverá después
+        null, returnAddress // Aquí va la dirección donde guardar el resultado
         );
         this.quadruples.enqueue(quadruple);
+        // Guardar este GOSUB para resolverlo después
+        const quadIndex = this.quadruples.size() - 1;
+        this.pendingGosubs.push({ quadIndex, functionName });
         return returnAddress;
     }
     /**
@@ -344,6 +352,40 @@ class QuadrupleGenerator {
         this.quadruples.enqueue(quadruple);
     }
     /**
+     * Genera un cuádruplo HALT para terminar el programa
+     */
+    generateHaltQuadruple() {
+        const quadruple = (0, quadruple_1.createQuadruple)(quadruple_1.QuadrupleOperator.HALT, null, null, null);
+        this.quadruples.enqueue(quadruple);
+    }
+    /**
+     * Registra la dirección de inicio de una función
+     * @param functionName Nombre de la función
+     * @param address Dirección de inicio
+     */
+    setFunctionAddress(functionName, address) {
+        this.functionAddresses.set(functionName, address);
+    }
+    /**
+     * Resuelve todos los cuádruplos GOSUB pendientes
+     */
+    resolvePendingGosubs() {
+        for (const pending of this.pendingGosubs) {
+            const functionAddress = this.functionAddresses.get(pending.functionName);
+            if (functionAddress !== undefined) {
+                const quad = this.quadruples.getAt(pending.quadIndex);
+                if (quad) {
+                    quad.leftOperand = functionAddress;
+                }
+            }
+            else {
+                throw new Error(`Error: no se pudo resolver la dirección de la función '${pending.functionName}'`);
+            }
+        }
+        // Limpiar la lista de pendientes
+        this.pendingGosubs = [];
+    }
+    /**
      * Obtiene todos los cuádruplos generados
      * @returns Lista de cuádruplos
      */
@@ -364,6 +406,9 @@ class QuadrupleGenerator {
         this.parameterStack.clear();
         this.callStack.clear();
         this.returnStack.clear();
+        // Limpiar mapas y listas de funciones
+        this.functionAddresses.clear();
+        this.pendingGosubs = [];
     }
 }
 exports.QuadrupleGenerator = QuadrupleGenerator;

@@ -143,13 +143,16 @@ class BabyDuckGrammar extends chevrotain_1.CstParser {
             this.CONSUME(tokens.RParen);
             this.CONSUME(tokens.SemiColon);
         });
-        // <expression> ::= <exp> [ ( '>' | '<' | '!=' ) <exp> ]
+        // <expression> ::= <exp> [ ( '>' | '<' | '>=' | '<=' | '==' | '!=' ) <exp> ]
         this.expression = this.RULE("expression", () => {
             this.SUBRULE(this.exp);
             this.OPTION(() => {
                 this.OR([
                     { ALT: () => this.CONSUME(tokens.GreaterThan) },
                     { ALT: () => this.CONSUME(tokens.LessThan) },
+                    { ALT: () => this.CONSUME(tokens.GreaterEquals) },
+                    { ALT: () => this.CONSUME(tokens.LessEquals) },
+                    { ALT: () => this.CONSUME(tokens.EqualsEquals) },
                     { ALT: () => this.CONSUME(tokens.NotEquals) }
                 ]);
                 this.SUBRULE2(this.exp);

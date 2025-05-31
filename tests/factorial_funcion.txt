@@ -1,0 +1,31 @@
+program factorial_funcion;
+var
+  numero: int;
+
+void calcular_factorial(n: int) [
+  var
+    factorial: int;
+    contador: int;
+  {
+    factorial = 1;
+    contador = 1;
+    
+    print("Calculando factorial de:");
+    print(n);
+    
+    while (contador <= n) do {
+      factorial = factorial * contador;
+      contador = contador + 1;
+    };
+    
+    print("El factorial es:");
+    print(factorial);
+  }
+];
+
+main {
+  numero = 6;
+  calcular_factorial(numero);
+  print("Factorial con funcion completado");
+}
+end

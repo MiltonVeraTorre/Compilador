@@ -1,10 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.QuadrupleOperator = void 0;
-exports.createQuadruple = createQuadruple;
-exports.quadrupleToString = quadrupleToString;
-exports.generateTempVar = generateTempVar;
-exports.resetTempCounter = resetTempCounter;
+exports.resetTempCounter = exports.generateTempVar = exports.quadrupleToString = exports.createQuadruple = exports.QuadrupleOperator = void 0;
 const virtual_memory_1 = require("../memory/virtual-memory");
 /**
  * Operadores adicionales para cuádruplos
@@ -39,6 +35,7 @@ var QuadrupleOperator;
     QuadrupleOperator["PARAM"] = "param";
     QuadrupleOperator["ERA"] = "era";
     QuadrupleOperator["ENDPROC"] = "endproc";
+    QuadrupleOperator["HALT"] = "halt";
 })(QuadrupleOperator || (exports.QuadrupleOperator = QuadrupleOperator = {}));
 /**
  * Crea un nuevo cuádruplo
@@ -56,6 +53,7 @@ function createQuadruple(operator, leftOperand = null, rightOperand = null, resu
         result
     };
 }
+exports.createQuadruple = createQuadruple;
 /**
  * Convierte un cuádruplo a string para mostrar
  * @param quad Cuádruplo
@@ -65,6 +63,7 @@ function quadrupleToString(quad) {
     var _a, _b, _c;
     return `(${quad.operator}, ${(_a = quad.leftOperand) !== null && _a !== void 0 ? _a : '_'}, ${(_b = quad.rightOperand) !== null && _b !== void 0 ? _b : '_'}, ${(_c = quad.result) !== null && _c !== void 0 ? _c : '_'})`;
 }
+exports.quadrupleToString = quadrupleToString;
 /**
  * Genera una dirección para una variable temporal
  * @param type Tipo de dato
@@ -73,6 +72,7 @@ function quadrupleToString(quad) {
 function generateTempVar(type) {
     return virtual_memory_1.virtualMemory.assignTempAddress(type);
 }
+exports.generateTempVar = generateTempVar;
 /**
  * Reinicia el contador de temporales
  * (Ahora se maneja en la memoria virtual)
@@ -81,4 +81,5 @@ function resetTempCounter() {
     // La memoria virtual se encarga de esto ahora
     virtual_memory_1.virtualMemory.reset();
 }
+exports.resetTempCounter = resetTempCounter;
 //# sourceMappingURL=quadruple.js.map

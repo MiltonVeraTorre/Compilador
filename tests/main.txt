@@ -1,0 +1,14 @@
+program simple;
+var
+  x: int;
+  y: int;
+  resultado: int;
+
+main {
+  x = 10;
+  y = 20;
+  resultado = x + y;
+  print(resultado);
+  print("Programa principal ejecutado");
+}
+end

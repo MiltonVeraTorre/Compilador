@@ -1,5 +1,5 @@
 import { DataType } from './semantic-cube';
-import { VariableTable, Variable } from './variable-table';
+import { Variable, VariableTable } from './variable-table';
 
 /**
  * Estructura de una funcion
@@ -81,14 +81,21 @@ export class FunctionDirectory {
       return false;
     }
 
-    // Agregar el parametro a la tabla de variables de la función
+    // Calcular la dirección del parámetro basada en su índice
+    // Los parámetros van en direcciones 5000 + índice
+    const paramIndex = func.parameters.length;
+    const paramAddress = 5000 + paramIndex;
+
+    // Agregar el parametro a la tabla de variables de la función con dirección específica
     func.variableTable.addVariable(name, type, true);
+    func.variableTable.setVariableAddress(name, paramAddress);
 
     // Agregar el parametro a la lista de parámetros
     func.parameters.push({
       name,
       type,
-      isParameter: true
+      isParameter: true,
+      address: paramAddress
     });
 
     return true;

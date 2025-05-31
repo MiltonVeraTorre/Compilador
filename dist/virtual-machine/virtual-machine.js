@@ -156,6 +156,9 @@ class VirtualMachine {
             case quadruple_1.QuadrupleOperator.ENDPROC:
                 this.executeEndproc(quad);
                 break;
+            case quadruple_1.QuadrupleOperator.HALT:
+                this.executeHalt(quad);
+                break;
             default:
                 throw new Error(`Operador desconocido: ${quad.operator}`);
         }
@@ -246,10 +249,18 @@ class VirtualMachine {
     executeParam(quad) {
         const paramValue = this.memory.getValue(quad.leftOperand);
         const paramIndex = quad.rightOperand;
-        // Los parámetros van en direcciones locales específicas
-        // Los parámetros van en direcciones 5000 + índice
+        // Los parámetros van en direcciones específicas dentro del contexto actual
+        // Cada contexto de activación tiene su propio espacio de parámetros
         const paramAddress = 5000 + paramIndex;
-        this.memory.setValue(paramAddress, paramValue);
+        // Usar el contexto de activación actual para almacenar el parámetro
+        const context = this.memory.getCurrentActivationContext();
+        if (context) {
+            context.parameterMemory.set(paramAddress, paramValue);
+        }
+        else {
+            // Si no hay contexto, usar el método normal (para compatibilidad)
+            this.memory.setValue(paramAddress, paramValue);
+        }
     }
     /**
      * Ejecuta una llamada a subrutina
@@ -258,8 +269,10 @@ class VirtualMachine {
     executeGosub(quad) {
         // Obtener el contexto actual y actualizar la dirección de retorno
         const context = this.memory.getCurrentActivationContext();
+        console.log(`[DEBUG] GOSUB: IP actual: ${this.instructionPointer}, contexto: ${context === null || context === void 0 ? void 0 : context.functionName}`);
         if (context) {
             context.returnAddress = this.instructionPointer + 1;
+            console.log(`[DEBUG] GOSUB: returnAddress establecido a: ${context.returnAddress}`);
             // Si hay dirección de resultado (quad.result), guardarla en el contexto
             if (quad.result !== null) {
                 context.resultAddress = quad.result;
@@ -267,6 +280,7 @@ class VirtualMachine {
         }
         // Saltar a la función
         this.instructionPointer = quad.leftOperand - 1;
+        console.log(`[DEBUG] GOSUB: saltando a IP: ${this.instructionPointer}`);
     }
     /**
      * Ejecuta un retorno de función
@@ -292,7 +306,37 @@ class VirtualMachine {
      * @param quad Cuádruplo
      */
     executeEndproc(_quad) {
-        // Terminar la ejecución si estamos en el programa principal
+        // Obtener el contexto actual antes de eliminarlo
+        const context = this.memory.getCurrentActivationContext();
+        console.log(`[DEBUG] ENDPROC: contexto actual: ${context === null || context === void 0 ? void 0 : context.functionName}, returnAddress: ${context === null || context === void 0 ? void 0 : context.returnAddress}`);
+        if (context) {
+            // Regresar a la dirección de retorno
+            const returnAddress = this.memory.popActivationContext();
+            console.log(`[DEBUG] ENDPROC: returnAddress obtenido: ${returnAddress}`);
+            if (returnAddress !== undefined) {
+                // Establecer la dirección de retorno menos 1 porque el bucle principal incrementará
+                // returnAddress apunta al siguiente cuádruple después del GOSUB
+                this.instructionPointer = returnAddress - 1;
+                console.log(`[DEBUG] ENDPROC: IP establecido a: ${this.instructionPointer} (returnAddress=${returnAddress})`);
+            }
+            else {
+                // Si no hay dirección de retorno, terminar la ejecución
+                console.log(`[DEBUG] ENDPROC: Sin dirección de retorno, terminando`);
+                this.running = false;
+            }
+        }
+        else {
+            // Si no hay contexto, terminar la ejecución (programa principal)
+            console.log(`[DEBUG] ENDPROC: Sin contexto, terminando`);
+            this.running = false;
+        }
+    }
+    /**
+     * Ejecuta la terminación del programa
+     * @param _quad Cuádruplo
+     */
+    executeHalt(_quad) {
+        console.log(`[DEBUG] HALT: Terminando programa`);
         this.running = false;
     }
     /**

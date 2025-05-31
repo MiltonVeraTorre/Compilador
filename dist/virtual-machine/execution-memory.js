@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.executionMemory = exports.ExecutionMemory = void 0;
-const semantic_cube_1 = require("../semantic/semantic-cube");
 const virtual_memory_1 = require("../memory/virtual-memory");
+const semantic_cube_1 = require("../semantic/semantic-cube");
 const activation_context_1 = require("./activation-context");
 /**
  * Mapa de Memoria de Ejecución
@@ -34,6 +34,13 @@ class ExecutionMemory {
                 }
                 this.activationStack.setLocalValue(address, value);
                 break;
+            case virtual_memory_1.MemorySegment.PARAMETER:
+                // Los parámetros se manejan como parte del contexto de activación
+                if (this.activationStack.isEmpty()) {
+                    this.activationStack.createContext('temp', 0);
+                }
+                this.activationStack.setParameterValue(address, value);
+                break;
             case virtual_memory_1.MemorySegment.TEMPORAL:
                 this.temporalMemory.set(address, value);
                 break;
@@ -60,6 +67,12 @@ class ExecutionMemory {
                     return undefined;
                 }
                 return this.activationStack.getLocalValue(address);
+            case virtual_memory_1.MemorySegment.PARAMETER:
+                // Si no hay contexto de activación, retornar undefined
+                if (this.activationStack.isEmpty()) {
+                    return undefined;
+                }
+                return this.activationStack.getParameterValue(address);
             case virtual_memory_1.MemorySegment.TEMPORAL:
                 return this.temporalMemory.get(address);
             case virtual_memory_1.MemorySegment.CONSTANT:
@@ -80,6 +93,8 @@ class ExecutionMemory {
                 return this.globalMemory.has(address);
             case virtual_memory_1.MemorySegment.LOCAL:
                 return this.activationStack.getLocalValue(address) !== undefined;
+            case virtual_memory_1.MemorySegment.PARAMETER:
+                return this.activationStack.getParameterValue(address) !== undefined;
             case virtual_memory_1.MemorySegment.TEMPORAL:
                 return this.temporalMemory.has(address);
             case virtual_memory_1.MemorySegment.CONSTANT:

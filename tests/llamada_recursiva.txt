@@ -1,0 +1,48 @@
+program llamada_recursiva;
+var
+  numero: int;
+
+void contar_regresivo(n: int) [
+  {
+    print("Contando:");
+    print(n);
+    
+    if (n > 0) {
+      contar_regresivo(n - 1);
+    };
+    
+    print("Regresando de:");
+    print(n);
+  }
+];
+
+void potencia(base: int, exponente: int) [
+  var
+    resultado: int;
+    contador: int;
+  {
+    resultado = 1;
+    contador = 0;
+    
+    while (contador < exponente) do {
+      resultado = resultado * base;
+      contador = contador + 1;
+    };
+    
+    print("Resultado de potencia:");
+    print(resultado);
+  }
+];
+
+main {
+  numero = 5;
+  print("Iniciando cuenta regresiva desde:");
+  print(numero);
+  contar_regresivo(numero);
+  
+  print("Calculando 2^4:");
+  potencia(2, 4);
+  
+  print("Llamadas recursivas completadas");
+}
+end

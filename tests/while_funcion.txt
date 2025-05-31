@@ -1,0 +1,59 @@
+program func_whil3;
+var
+  numero: int;
+
+void sumar_hasta(limite: int) [
+  var
+    contador: int;
+    suma: int;
+  {
+    contador = 1;
+    suma = 0;
+    
+    print("Sumando hasta:");
+    print(limite);
+    
+    while (contador <= limite) do {
+      suma = suma + contador;
+      contador = contador + 1;
+    };
+    
+    print("Suma total:");
+    print(suma);
+  }
+];
+
+void tabla_multiplicar(numero: int) [
+  var
+    contador: int;
+    resultado: int;
+  {
+    contador = 1;
+    
+    print("Tabla del:");
+    print(numero);
+    
+    while (contador <= 10) do {
+      resultado = numero * contador;
+      print(numero);
+      print("x");
+      print(contador);
+      print("=");
+      print(resultado);
+      contador = contador + 1;
+    };
+  }
+];
+
+main {
+  numero = 7;
+  
+  print("Ejecutando suma hasta 15:");
+  sumar_hasta(15);
+  
+  print("Ejecutando tabla de multiplicar:");
+  tabla_multiplicar(numero);
+  
+  print("While en funciones completado");
+}
+end

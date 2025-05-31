@@ -1,6 +1,6 @@
-import { DataType } from '../semantic/semantic-cube';
 import { MemorySegment, virtualMemory } from '../memory/virtual-memory';
-import { ActivationStack, ActivationContext } from './activation-context';
+import { DataType } from '../semantic/semantic-cube';
+import { ActivationContext, ActivationStack } from './activation-context';
 
 /**
  * Mapa de Memoria de Ejecución
@@ -48,6 +48,14 @@ export class ExecutionMemory {
         this.activationStack.setLocalValue(address, value);
         break;
 
+      case MemorySegment.PARAMETER:
+        // Los parámetros se manejan como parte del contexto de activación
+        if (this.activationStack.isEmpty()) {
+          this.activationStack.createContext('temp', 0);
+        }
+        this.activationStack.setParameterValue(address, value);
+        break;
+
       case MemorySegment.TEMPORAL:
         this.temporalMemory.set(address, value);
         break;
@@ -80,6 +88,13 @@ export class ExecutionMemory {
         }
         return this.activationStack.getLocalValue(address);
 
+      case MemorySegment.PARAMETER:
+        // Si no hay contexto de activación, retornar undefined
+        if (this.activationStack.isEmpty()) {
+          return undefined;
+        }
+        return this.activationStack.getParameterValue(address);
+
       case MemorySegment.TEMPORAL:
         return this.temporalMemory.get(address);
 
@@ -105,6 +120,9 @@ export class ExecutionMemory {
 
       case MemorySegment.LOCAL:
         return this.activationStack.getLocalValue(address) !== undefined;
+
+      case MemorySegment.PARAMETER:
+        return this.activationStack.getParameterValue(address) !== undefined;
 
       case MemorySegment.TEMPORAL:
         return this.temporalMemory.has(address);
