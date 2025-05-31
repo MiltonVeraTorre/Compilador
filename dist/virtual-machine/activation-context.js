@@ -27,7 +27,7 @@ class ActivationStack {
         return context;
     }
     /**
-     * Obtiene el contexto actual (tope de la pila)
+     * Obtiene el contexto actual
      * @returns El contexto actual o undefined si la pila está vacía
      */
     getCurrentContext() {

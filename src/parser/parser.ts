@@ -3,8 +3,7 @@ import { functionDirectory } from "../semantic/function-directory";
 import { semanticAnalyzer } from "../semantic/semantic-analyzer";
 import {
   BodyCstNode,
-  ProgramCstNode,
-  StatementCstNode
+  ProgramCstNode
 } from "./cst-types";
 import { BabyDuckGrammar } from "./grammar";
 
@@ -68,7 +67,7 @@ export class BabyDuckParser {
       semanticAnalyzer.processVars(programNode.children.vars[0]);
     }
 
-    // PASO 1: Declarar todas las funciones (sin procesar sus cuerpos)
+    // Declarar todas las funciones (sin procesar sus cuerpos)
     if (programNode.children.func && programNode.children.func.length > 0) {
       for (const funcNode of programNode.children.func) {
         semanticAnalyzer.processFunc(funcNode);
@@ -77,11 +76,11 @@ export class BabyDuckParser {
         if (funcNode.children.vars && funcNode.children.vars.length > 0) {
           semanticAnalyzer.processVars(funcNode.children.vars[0]);
         }
-        // NO procesamos el cuerpo de la función aquí
+
       }
     }
 
-    // PASO 2: Establecer el ambito global y procesar el cuerpo principal
+    // Establecer el ambito global y procesar el cuerpo principal
     functionDirectory.setCurrentFunction('global');
 
     // Procesar el cuerpo principal
@@ -92,7 +91,7 @@ export class BabyDuckParser {
     // Generar cuádruplo HALT al final del main
     semanticAnalyzer.generateHaltQuadruple();
 
-    // PASO 3: Procesar los cuerpos de las funciones
+    // Procesar los cuerpos de las funciones
     if (programNode.children.func && programNode.children.func.length > 0) {
       for (const funcNode of programNode.children.func) {
         const idToken = funcNode.children.Identifier[0];
@@ -115,7 +114,7 @@ export class BabyDuckParser {
       }
     }
 
-    // PASO 4: Resolver todos los GOSUB pendientes
+    // Resolver todos los GOSUB pendientes
     semanticAnalyzer.resolvePendingGosubs();
   }
 
@@ -128,15 +127,6 @@ export class BabyDuckParser {
     semanticAnalyzer.processBody(bodyNode);
   }
 
-  /**
-   * Procesa un statement
-   * @param statementNode Nodo del statement
-   */
-  private processStatement(statementNode: StatementCstNode): void {
-    // Usar el método processStatement del analizador semántico
-    semanticAnalyzer.processStatement(statementNode);
-  }
 }
 
-// Exportar un singleton
 export const babyDuckParser = new BabyDuckParser();

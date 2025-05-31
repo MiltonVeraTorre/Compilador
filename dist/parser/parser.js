@@ -52,7 +52,7 @@ class BabyDuckParser {
         if (programNode.children.vars && programNode.children.vars.length > 0) {
             semantic_analyzer_1.semanticAnalyzer.processVars(programNode.children.vars[0]);
         }
-        // PASO 1: Declarar todas las funciones (sin procesar sus cuerpos)
+        // Declarar todas las funciones (sin procesar sus cuerpos)
         if (programNode.children.func && programNode.children.func.length > 0) {
             for (const funcNode of programNode.children.func) {
                 semantic_analyzer_1.semanticAnalyzer.processFunc(funcNode);
@@ -60,10 +60,9 @@ class BabyDuckParser {
                 if (funcNode.children.vars && funcNode.children.vars.length > 0) {
                     semantic_analyzer_1.semanticAnalyzer.processVars(funcNode.children.vars[0]);
                 }
-                // NO procesamos el cuerpo de la función aquí
             }
         }
-        // PASO 2: Establecer el ambito global y procesar el cuerpo principal
+        // Establecer el ambito global y procesar el cuerpo principal
         function_directory_1.functionDirectory.setCurrentFunction('global');
         // Procesar el cuerpo principal
         if (programNode.children.body && programNode.children.body.length > 0) {
@@ -71,7 +70,7 @@ class BabyDuckParser {
         }
         // Generar cuádruplo HALT al final del main
         semantic_analyzer_1.semanticAnalyzer.generateHaltQuadruple();
-        // PASO 3: Procesar los cuerpos de las funciones
+        // Procesar los cuerpos de las funciones
         if (programNode.children.func && programNode.children.func.length > 0) {
             for (const funcNode of programNode.children.func) {
                 const idToken = funcNode.children.Identifier[0];
@@ -89,7 +88,7 @@ class BabyDuckParser {
                 semantic_analyzer_1.semanticAnalyzer.generateEndprocQuadruple();
             }
         }
-        // PASO 4: Resolver todos los GOSUB pendientes
+        // Resolver todos los GOSUB pendientes
         semantic_analyzer_1.semanticAnalyzer.resolvePendingGosubs();
     }
     /**
@@ -100,16 +99,7 @@ class BabyDuckParser {
         // Usar el método processBody del analizador semántico
         semantic_analyzer_1.semanticAnalyzer.processBody(bodyNode);
     }
-    /**
-     * Procesa un statement
-     * @param statementNode Nodo del statement
-     */
-    processStatement(statementNode) {
-        // Usar el método processStatement del analizador semántico
-        semantic_analyzer_1.semanticAnalyzer.processStatement(statementNode);
-    }
 }
 exports.BabyDuckParser = BabyDuckParser;
-// Exportar un singleton
 exports.babyDuckParser = new BabyDuckParser();
 //# sourceMappingURL=parser.js.map

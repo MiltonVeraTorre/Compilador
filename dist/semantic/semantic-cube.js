@@ -172,6 +172,5 @@ class SemanticCube {
     }
 }
 exports.SemanticCube = SemanticCube;
-// Exportar un singleton
 exports.semanticCube = new SemanticCube();
 //# sourceMappingURL=semantic-cube.js.map

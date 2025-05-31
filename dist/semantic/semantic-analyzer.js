@@ -427,7 +427,7 @@ class SemanticAnalyzer {
             this.addError(`Función no declarada: ${funcName}`, idToken);
             return;
         }
-        // PRIMERO: Procesar argumentos (evaluar expresiones ANTES de crear el contexto)
+        // Procesar argumentos evaluar expresiones antes de crear el contexto
         if (fCallNode.children.argList && fCallNode.children.argList.length > 0) {
             this.processArgList(fCallNode.children.argList[0], func.parameters);
         }
@@ -435,13 +435,13 @@ class SemanticAnalyzer {
             this.addError(`Faltan argumentos en la llamada a la función: ${funcName}`, idToken);
             return;
         }
-        // SEGUNDO: Generar cuádruplo ERA (Espacio de Activación)
+        // Generar cuádruplo ERA
         quadruples_1.quadrupleGenerator.generateEraQuadruple(funcName);
-        // TERCERO: Generar cuádruplos PARAM (los valores ya están evaluados)
+        // Generar cuádruplos PARAM con los valores ya evaluados
         if (fCallNode.children.argList && fCallNode.children.argList.length > 0) {
             this.generateParamQuadruples(func.parameters.length);
         }
-        // CUARTO: Generar cuádruplo GOSUB (llamada a la función)
+        // Generar cuádruplo GOSUB
         quadruples_1.quadrupleGenerator.generateGosubQuadruple(funcName);
     }
     /**
@@ -452,11 +452,11 @@ class SemanticAnalyzer {
         // Procesar la expresión de la condición
         this.processExpression(conditionNode.children.expression[0]);
         const conditionType = this.currentType;
-        // Verificar que la condición sea de tipo entero (booleano)
+        // Verificar que la condición sea de tipo entero
         if (conditionType !== semantic_cube_1.DataType.INT) {
             this.addError(`La condición debe ser de tipo entero (booleano), no ${conditionType}`, conditionNode.children.expression[0]);
         }
-        // Generar el cuádruplo GOTOF (salto si falso)
+        // Generar el cuádruplo GOTOF
         const gotofIndex = quadruples_1.quadrupleGenerator.generateGotofQuadruple();
         // Procesar el cuerpo del if
         this.processBody(conditionNode.children.body[0]);
@@ -486,11 +486,11 @@ class SemanticAnalyzer {
         // Procesar la expresión de la condición
         this.processExpression(cycleNode.children.expression[0]);
         const conditionType = this.currentType;
-        // Verificar que la condición sea de tipo entero (booleano)
+        // Verificar que la condición sea de tipo entero
         if (conditionType !== semantic_cube_1.DataType.INT) {
             this.addError(`La condición debe ser de tipo entero (booleano), no ${conditionType}`, cycleNode.children.expression[0]);
         }
-        // Generar el cuádruplo GOTOF (salto si falso)
+        // Generar el cuádruplo GOTOF
         const gotofIndex = quadruples_1.quadrupleGenerator.generateGotofQuadruple();
         // Procesar el cuerpo del ciclo
         this.processBody(cycleNode.children.body[0]);
@@ -501,7 +501,7 @@ class SemanticAnalyzer {
         quadruples_1.quadrupleGenerator.fillJump(gotofIndex, quadruples_1.quadrupleGenerator.getNextQuadIndex());
     }
     /**
-     * Procesa un cuerpo (bloque de código)
+     * Procesa un cuerpo
      * @param bodyNode Nodo de cuerpo
      */
     processBody(bodyNode) {
@@ -578,7 +578,7 @@ class SemanticAnalyzer {
             this.addError(`Número incorrecto de argumentos: esperados ${parameters.length}, recibidos ${expressions.length}`, argListNode);
             return;
         }
-        // Verificar tipo de cada argumento (solo evaluar expresiones)
+        // Verificar tipo de cada argumento
         for (let i = 0; i < expressions.length; i++) {
             this.processExpression(expressions[i]);
             const argType = this.currentType;
@@ -591,7 +591,6 @@ class SemanticAnalyzer {
             if (!isValid) {
                 this.addError(`Tipo incompatible en argumento ${i + 1}: esperado ${paramType}, recibido ${argType}`, expressions[i]);
             }
-            // NO generar cuádruplos PARAM aquí - se harán después del ERA
         }
     }
     /**
@@ -599,7 +598,7 @@ class SemanticAnalyzer {
      * @param paramCount Número de parámetros
      */
     generateParamQuadruples(paramCount) {
-        // Generar cuádruplos PARAM en orden inverso (porque están en la pila)
+        // Generar cuádruplos PARAM en orden inverso porque están en la pila
         for (let i = paramCount - 1; i >= 0; i--) {
             quadruples_1.quadrupleGenerator.generateParamQuadruple(i);
         }
@@ -634,6 +633,5 @@ class SemanticAnalyzer {
     }
 }
 exports.SemanticAnalyzer = SemanticAnalyzer;
-// Exportar un singleton
 exports.semanticAnalyzer = new SemanticAnalyzer();
 //# sourceMappingURL=semantic-analyzer.js.map

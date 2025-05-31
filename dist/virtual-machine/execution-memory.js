@@ -215,6 +215,5 @@ class ExecutionMemory {
     }
 }
 exports.ExecutionMemory = ExecutionMemory;
-// Exportar un singleton
 exports.executionMemory = new ExecutionMemory();
 //# sourceMappingURL=execution-memory.js.map

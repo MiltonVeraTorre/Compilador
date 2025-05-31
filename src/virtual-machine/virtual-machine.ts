@@ -97,7 +97,6 @@ export class VirtualMachine {
         });
         break;
 
-      // Operaciones relacionales
       case Operator.GREATER_THAN:
       case QuadrupleOperator.GREATER_THAN:
         this.executeRelational(quad, (a, b) => a > b ? 1 : 0);
@@ -127,8 +126,6 @@ export class VirtualMachine {
       case QuadrupleOperator.EQUALS:
         this.executeRelational(quad, (a, b) => a === b ? 1 : 0);
         break;
-
-
 
       // Asignación
       case Operator.ASSIGN:
@@ -242,7 +239,7 @@ export class VirtualMachine {
   }
 
   /**
-   * Ejecuta un salto condicional (si falso)
+   * Ejecuta un salto condicional
    * @param quad Cuádruplo
    */
   private executeGotof(quad: Quadruple): void {
@@ -253,7 +250,7 @@ export class VirtualMachine {
   }
 
   /**
-   * Ejecuta un salto condicional (si verdadero)
+   * Ejecuta un salto condicional
    * @param quad Cuádruplo
    */
   private executeGotot(quad: Quadruple): void {
@@ -268,8 +265,7 @@ export class VirtualMachine {
    * @param quad Cuádruplo
    */
   private executeEra(quad: Quadruple): void {
-    // El tamaño del espacio está en leftOperand (no se usa actualmente pero se mantiene para compatibilidad)
-    // Crear el contexto de activación inmediatamente
+    // El tamaño del espacio está en leftOperand no se usa actualmente pero se mantiene para potencialmente optimizar la asignación de memoria
     this.memory.createActivationContext('function', this.instructionPointer + 1);
   }
 
@@ -302,11 +298,9 @@ export class VirtualMachine {
   private executeGosub(quad: Quadruple): void {
     // Obtener el contexto actual y actualizar la dirección de retorno
     const context = this.memory.getCurrentActivationContext();
-    console.log(`[DEBUG] GOSUB: IP actual: ${this.instructionPointer}, contexto: ${context?.functionName}`);
 
     if (context) {
       context.returnAddress = this.instructionPointer + 1;
-      console.log(`[DEBUG] GOSUB: returnAddress establecido a: ${context.returnAddress}`);
 
       // Si hay dirección de resultado (quad.result), guardarla en el contexto
       if (quad.result !== null) {
@@ -316,7 +310,6 @@ export class VirtualMachine {
 
     // Saltar a la función
     this.instructionPointer = quad.leftOperand! - 1;
-    console.log(`[DEBUG] GOSUB: saltando a IP: ${this.instructionPointer}`);
   }
 
   /**
@@ -349,26 +342,20 @@ export class VirtualMachine {
     // Obtener el contexto actual antes de eliminarlo
     const context = this.memory.getCurrentActivationContext();
 
-    console.log(`[DEBUG] ENDPROC: contexto actual: ${context?.functionName}, returnAddress: ${context?.returnAddress}`);
-
     if (context) {
       // Regresar a la dirección de retorno
       const returnAddress = this.memory.popActivationContext();
-      console.log(`[DEBUG] ENDPROC: returnAddress obtenido: ${returnAddress}`);
 
       if (returnAddress !== undefined) {
         // Establecer la dirección de retorno menos 1 porque el bucle principal incrementará
         // returnAddress apunta al siguiente cuádruple después del GOSUB
         this.instructionPointer = returnAddress - 1;
-        console.log(`[DEBUG] ENDPROC: IP establecido a: ${this.instructionPointer} (returnAddress=${returnAddress})`);
       } else {
         // Si no hay dirección de retorno, terminar la ejecución
-        console.log(`[DEBUG] ENDPROC: Sin dirección de retorno, terminando`);
         this.running = false;
       }
     } else {
-      // Si no hay contexto, terminar la ejecución (programa principal)
-      console.log(`[DEBUG] ENDPROC: Sin contexto, terminando`);
+      // Si no hay contexto, terminar la ejecución
       this.running = false;
     }
   }
@@ -378,7 +365,6 @@ export class VirtualMachine {
    * @param _quad Cuádruplo
    */
   private executeHalt(_quad: Quadruple): void {
-    console.log(`[DEBUG] HALT: Terminando programa`);
     this.running = false;
   }
 
@@ -398,11 +384,10 @@ export class VirtualMachine {
    */
   private executeRead(quad: Quadruple): void {
     // Por simplicidad, simulamos la entrada del usuario con valores predefinidos
-    // En una implementación real, esto leería de stdin o una interfaz de usuario
     const address = quad.result!;
 
-    // Simulamos entrada del usuario - en tests se puede configurar
-    let inputValue: any = 0;
+    // Simulamos entrada del usuario
+    let inputValue: any = 1;
 
     // Si hay un valor en leftOperand, lo usamos como valor por defecto para testing
     if (quad.leftOperand !== null) {

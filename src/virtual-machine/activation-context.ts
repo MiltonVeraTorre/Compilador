@@ -8,7 +8,7 @@ export interface ActivationContext {
   returnAddress: number; // Dirección de retorno en los cuádruplos
   localMemory: Map<number, any>; // Mapa de direcciones locales a valores
   parameterMemory: Map<number, any>; // Mapa de direcciones de parámetros a valores
-  returnValue?: any; // Valor de retorno (si aplica)
+  returnValue?: any; // Valor de retorno
   resultAddress?: number; // Dirección donde guardar el resultado de la función
 }
 
@@ -43,7 +43,7 @@ export class ActivationStack {
   }
 
   /**
-   * Obtiene el contexto actual (tope de la pila)
+   * Obtiene el contexto actual
    * @returns El contexto actual o undefined si la pila está vacía
    */
   public getCurrentContext(): ActivationContext | undefined {

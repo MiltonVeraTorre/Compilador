@@ -21,5 +21,4 @@ export class BabyDuckLexer {
   }
 }
 
-// Crear y exportar una instancia singleton del analizador léxico
 export const babyDuckLexer = new BabyDuckLexer();

@@ -205,5 +205,4 @@ export class SemanticCube {
   }
 }
 
-// Exportar un singleton
 export const semanticCube = new SemanticCube();

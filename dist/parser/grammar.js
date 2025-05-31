@@ -47,9 +47,9 @@ class BabyDuckGrammar extends chevrotain_1.CstParser {
             this.SUBRULE(this.body);
             this.CONSUME(tokens.End);
         });
+        // <vars> ::= var Id ':' <type> ';' { Id ':' <type> ';' }
         // <varsOpt> ::= <vars> | ε
         // Manejado en la regla program con OPTION
-        // <vars> ::= var Id ':' <type> ';' { Id ':' <type> ';' }
         this.vars = this.RULE("vars", () => {
             this.CONSUME(tokens.Var);
             this.AT_LEAST_ONE(() => {
@@ -197,9 +197,9 @@ class BabyDuckGrammar extends chevrotain_1.CstParser {
                 { ALT: () => this.CONSUME(tokens.CteFloat) }
             ]);
         });
+        // <func> ::= void Id '(' <paramListOpt> ')' '[' <varsOpt> <body> ']' ';'
         // <funcsOpt> ::= { <func> }
         // Manejado en la regla program con MANY
-        // <func> ::= void Id '(' <paramListOpt> ')' '[' <varsOpt> <body> ']' ';'
         this.func = this.RULE("func", () => {
             this.CONSUME(tokens.Void);
             this.CONSUME(tokens.Identifier);
@@ -216,9 +216,9 @@ class BabyDuckGrammar extends chevrotain_1.CstParser {
             this.CONSUME(tokens.RBracket);
             this.CONSUME(tokens.SemiColon);
         });
+        // <paramList> ::= Id ':' <type> { ',' Id ':' <type> }
         // <paramListOpt> ::= <paramList> | ε
         // Manejado en la regla func con OPTION
-        // <paramList> ::= Id ':' <type> { ',' Id ':' <type> }
         this.paramList = this.RULE("paramList", () => {
             this.CONSUME(tokens.Identifier);
             this.CONSUME(tokens.Colon);
@@ -240,9 +240,9 @@ class BabyDuckGrammar extends chevrotain_1.CstParser {
             this.CONSUME(tokens.RParen);
             this.CONSUME(tokens.SemiColon);
         });
+        // <argList> ::= <expression> { ',' <expression> }
         // <argListOpt> ::= <argList> | ε
         // Manejado en la regla f_call con OPTION
-        // <argList> ::= <expression> { ',' <expression> }
         this.argList = this.RULE("argList", () => {
             this.SUBRULE(this.expression);
             this.MANY(() => {

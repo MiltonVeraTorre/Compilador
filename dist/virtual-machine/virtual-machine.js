@@ -81,7 +81,6 @@ class VirtualMachine {
                     return a / b;
                 });
                 break;
-            // Operaciones relacionales
             case semantic_cube_1.Operator.GREATER_THAN:
             case quadruple_1.QuadrupleOperator.GREATER_THAN:
                 this.executeRelational(quad, (a, b) => a > b ? 1 : 0);
@@ -201,7 +200,7 @@ class VirtualMachine {
         this.instructionPointer = quad.result - 1; // -1 porque se incrementará después
     }
     /**
-     * Ejecuta un salto condicional (si falso)
+     * Ejecuta un salto condicional
      * @param quad Cuádruplo
      */
     executeGotof(quad) {
@@ -211,7 +210,7 @@ class VirtualMachine {
         }
     }
     /**
-     * Ejecuta un salto condicional (si verdadero)
+     * Ejecuta un salto condicional
      * @param quad Cuádruplo
      */
     executeGotot(quad) {
@@ -225,8 +224,7 @@ class VirtualMachine {
      * @param quad Cuádruplo
      */
     executeEra(quad) {
-        // El tamaño del espacio está en leftOperand (no se usa actualmente pero se mantiene para compatibilidad)
-        // Crear el contexto de activación inmediatamente
+        // El tamaño del espacio está en leftOperand no se usa actualmente pero se mantiene para potencialmente optimizar la asignación de memoria
         this.memory.createActivationContext('function', this.instructionPointer + 1);
     }
     /**
@@ -256,10 +254,8 @@ class VirtualMachine {
     executeGosub(quad) {
         // Obtener el contexto actual y actualizar la dirección de retorno
         const context = this.memory.getCurrentActivationContext();
-        console.log(`[DEBUG] GOSUB: IP actual: ${this.instructionPointer}, contexto: ${context === null || context === void 0 ? void 0 : context.functionName}`);
         if (context) {
             context.returnAddress = this.instructionPointer + 1;
-            console.log(`[DEBUG] GOSUB: returnAddress establecido a: ${context.returnAddress}`);
             // Si hay dirección de resultado (quad.result), guardarla en el contexto
             if (quad.result !== null) {
                 context.resultAddress = quad.result;
@@ -267,7 +263,6 @@ class VirtualMachine {
         }
         // Saltar a la función
         this.instructionPointer = quad.leftOperand - 1;
-        console.log(`[DEBUG] GOSUB: saltando a IP: ${this.instructionPointer}`);
     }
     /**
      * Ejecuta un retorno de función
@@ -295,26 +290,21 @@ class VirtualMachine {
     executeEndproc(_quad) {
         // Obtener el contexto actual antes de eliminarlo
         const context = this.memory.getCurrentActivationContext();
-        console.log(`[DEBUG] ENDPROC: contexto actual: ${context === null || context === void 0 ? void 0 : context.functionName}, returnAddress: ${context === null || context === void 0 ? void 0 : context.returnAddress}`);
         if (context) {
             // Regresar a la dirección de retorno
             const returnAddress = this.memory.popActivationContext();
-            console.log(`[DEBUG] ENDPROC: returnAddress obtenido: ${returnAddress}`);
             if (returnAddress !== undefined) {
                 // Establecer la dirección de retorno menos 1 porque el bucle principal incrementará
                 // returnAddress apunta al siguiente cuádruple después del GOSUB
                 this.instructionPointer = returnAddress - 1;
-                console.log(`[DEBUG] ENDPROC: IP establecido a: ${this.instructionPointer} (returnAddress=${returnAddress})`);
             }
             else {
                 // Si no hay dirección de retorno, terminar la ejecución
-                console.log(`[DEBUG] ENDPROC: Sin dirección de retorno, terminando`);
                 this.running = false;
             }
         }
         else {
-            // Si no hay contexto, terminar la ejecución (programa principal)
-            console.log(`[DEBUG] ENDPROC: Sin contexto, terminando`);
+            // Si no hay contexto, terminar la ejecución
             this.running = false;
         }
     }
@@ -323,7 +313,6 @@ class VirtualMachine {
      * @param _quad Cuádruplo
      */
     executeHalt(_quad) {
-        console.log(`[DEBUG] HALT: Terminando programa`);
         this.running = false;
     }
     /**
@@ -339,10 +328,9 @@ class VirtualMachine {
      */
     executeRead(quad) {
         // Por simplicidad, simulamos la entrada del usuario con valores predefinidos
-        // En una implementación real, esto leería de stdin o una interfaz de usuario
         const address = quad.result;
-        // Simulamos entrada del usuario - en tests se puede configurar
-        let inputValue = 0;
+        // Simulamos entrada del usuario
+        let inputValue = 1;
         // Si hay un valor en leftOperand, lo usamos como valor por defecto para testing
         if (quad.leftOperand !== null) {
             inputValue = this.memory.getValue(quad.leftOperand);

@@ -8,13 +8,13 @@ import { ActivationContext, ActivationStack } from './activation-context';
  * Maneja la memoria durante la ejecución de la máquina virtual
  */
 export class ExecutionMemory {
-  // Memoria global (variables globales)
+  // Memoria global
   private globalMemory: Map<number, any>;
 
   // Memoria de constantes
   private constantMemory: Map<number, any>;
 
-  // Memoria temporal (variables temporales)
+  // Memoria temporal
   private temporalMemory: Map<number, any>;
 
   // Pila de contextos de activación para funciones
@@ -259,5 +259,4 @@ export class ExecutionMemory {
   }
 }
 
-// Exportar un singleton
 export const executionMemory = new ExecutionMemory();

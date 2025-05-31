@@ -231,6 +231,5 @@ class VirtualMemory {
     }
 }
 exports.VirtualMemory = VirtualMemory;
-// Exportar un singleton
 exports.virtualMemory = new VirtualMemory();
 //# sourceMappingURL=virtual-memory.js.map

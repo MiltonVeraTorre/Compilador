@@ -5,9 +5,9 @@
  * de cuádruplos en la máquina virtual
  */
 
-export { VirtualMachine } from './virtual-machine';
+export { ActivationContext, ActivationStack } from './activation-context';
 export { ExecutionMemory, executionMemory } from './execution-memory';
-export { ActivationStack, ActivationContext } from './activation-context';
+export { VirtualMachine } from './virtual-machine';
 
 // Re-exportar tipos útiles
 export type { ActivationContext as IActivationContext } from './activation-context';

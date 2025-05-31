@@ -1,13 +1,9 @@
 import { virtualMemory } from '../memory/virtual-memory';
 import { DataType, Operator } from '../semantic/semantic-cube';
 
-/**
- * Operadores adicionales para cuádruplos
- *
- * Extiende los operadores básicos del cubo semántico
- */
+
 export enum QuadrupleOperator {
-  // Operadores heredados del cubo semántico
+  // Operadores del cubo semántico
   PLUS = '+',
   MINUS = '-',
   MULTIPLY = '*',
@@ -39,7 +35,7 @@ export enum QuadrupleOperator {
  * Estructura de un cuádruplo
  *
  * Representa una instrucción de código intermedio
- * Los operandos y resultados ahora son direcciones virtuales (números)
+ * Los operandos y resultados son direcciones virtuales
  */
 export interface Quadruple {
   operator: QuadrupleOperator | Operator;
@@ -90,9 +86,8 @@ export function generateTempVar(type: DataType): number {
 
 /**
  * Reinicia el contador de temporales
- * (Ahora se maneja en la memoria virtual)
  */
 export function resetTempCounter(): void {
-  // La memoria virtual se encarga de esto ahora
+  // La memoria virtual se encarga de esto
   virtualMemory.reset();
 }

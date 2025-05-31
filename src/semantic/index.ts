@@ -1,5 +1,3 @@
-// Exporto todo desde aqui
-
 // Cubo semantico
 export { DataType, Operator, semanticCube } from './semantic-cube';
 
@@ -10,4 +8,5 @@ export { Function, FunctionDirectory, functionDirectory } from './function-direc
 export { Variable, VariableTable } from './variable-table';
 
 // Analizador semantico
-export { SemanticError, SemanticAnalyzer, semanticAnalyzer } from './semantic-analyzer';
+export { SemanticAnalyzer, semanticAnalyzer, SemanticError } from './semantic-analyzer';
+

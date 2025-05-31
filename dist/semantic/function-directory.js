@@ -52,7 +52,7 @@ class FunctionDirectory {
         }
         const func = this.functions.get(this.currentFunction);
         if (!func) {
-            return false; // si no se encontro la funcion
+            return false;
         }
         // Verificar si el parámetro ya existe
         if (func.variableTable.variableExists(name)) {
@@ -197,6 +197,5 @@ class FunctionDirectory {
     }
 }
 exports.FunctionDirectory = FunctionDirectory;
-// Exportar un singleton
 exports.functionDirectory = new FunctionDirectory();
 //# sourceMappingURL=function-directory.js.map

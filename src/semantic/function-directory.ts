@@ -9,7 +9,7 @@ export interface Function {
   type: DataType;
   parameters: Variable[];
   variableTable: VariableTable;
-  startAddress?: number; // Direccion para generar codigo
+  startAddress?: number;
 }
 
 /**
@@ -73,7 +73,7 @@ export class FunctionDirectory {
 
     const func = this.functions.get(this.currentFunction);
     if (!func) {
-      return false; // si no se encontro la funcion
+      return false;
     }
 
     // Verificar si el parámetro ya existe
@@ -241,5 +241,4 @@ export class FunctionDirectory {
   }
 }
 
-// Exportar un singleton
 export const functionDirectory = new FunctionDirectory();

@@ -26,10 +26,11 @@ export class BabyDuckGrammar extends CstParser {
     this.CONSUME(tokens.End);
   });
 
-  // <varsOpt> ::= <vars> | ε
-  // Manejado en la regla program con OPTION
+
 
   // <vars> ::= var Id ':' <type> ';' { Id ':' <type> ';' }
+  // <varsOpt> ::= <vars> | ε
+  // Manejado en la regla program con OPTION
   private vars = this.RULE("vars", () => {
     this.CONSUME(tokens.Var);
     this.AT_LEAST_ONE(() => {
@@ -190,10 +191,10 @@ export class BabyDuckGrammar extends CstParser {
     ]);
   });
 
-  // <funcsOpt> ::= { <func> }
-  // Manejado en la regla program con MANY
 
   // <func> ::= void Id '(' <paramListOpt> ')' '[' <varsOpt> <body> ']' ';'
+  // <funcsOpt> ::= { <func> }
+  // Manejado en la regla program con MANY
   private func = this.RULE("func", () => {
     this.CONSUME(tokens.Void);
     this.CONSUME(tokens.Identifier);
@@ -211,10 +212,9 @@ export class BabyDuckGrammar extends CstParser {
     this.CONSUME(tokens.SemiColon);
   });
 
+  // <paramList> ::= Id ':' <type> { ',' Id ':' <type> }
   // <paramListOpt> ::= <paramList> | ε
   // Manejado en la regla func con OPTION
-
-  // <paramList> ::= Id ':' <type> { ',' Id ':' <type> }
   private paramList = this.RULE("paramList", () => {
     this.CONSUME(tokens.Identifier);
     this.CONSUME(tokens.Colon);
@@ -238,10 +238,9 @@ export class BabyDuckGrammar extends CstParser {
     this.CONSUME(tokens.SemiColon);
   });
 
+  // <argList> ::= <expression> { ',' <expression> }
   // <argListOpt> ::= <argList> | ε
   // Manejado en la regla f_call con OPTION
-
-  // <argList> ::= <expression> { ',' <expression> }
   private argList = this.RULE("argList", () => {
     this.SUBRULE(this.expression);
     this.MANY(() => {

@@ -1,7 +1,5 @@
-// Exporto todo desde aqui
-export { 
-  VirtualMemory, 
-  virtualMemory, 
-  MemorySegment, 
-  MEMORY_RANGES 
+export {
+  MEMORY_RANGES, MemorySegment, VirtualMemory,
+  virtualMemory
 } from './virtual-memory';
+

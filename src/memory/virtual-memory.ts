@@ -274,5 +274,4 @@ export class VirtualMemory {
   }
 }
 
-// Exportar un singleton
 export const virtualMemory = new VirtualMemory();

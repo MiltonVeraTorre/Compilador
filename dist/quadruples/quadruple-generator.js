@@ -20,7 +20,6 @@ class QuadrupleGenerator {
         this.typeStack = new stack_1.Stack();
         this.quadruples = new queue_1.Queue();
         this.addressMap = new Map();
-        this.jumpCounter = 0;
         // Inicializar pilas para funciones
         this.parameterStack = new stack_1.Stack();
         this.callStack = new stack_1.Stack();
@@ -38,14 +37,14 @@ class QuadrupleGenerator {
         // Convertir el operando a dirección virtual
         let address;
         if (typeof operand === 'string') {
-            // Verificar si es una cadena literal (no es una variable)
+            // Verificar si es una cadena literal
             const variable = function_directory_1.functionDirectory.lookupVariable(operand);
             if (!variable) {
                 // Es una cadena literal, asignar dirección de constante
                 address = virtual_memory_1.virtualMemory.assignConstantAddress(operand, type);
             }
             else {
-                // Es una variable, manejar como antes
+                // Es una variable
                 if (this.addressMap.has(operand)) {
                     address = this.addressMap.get(operand);
                 }
@@ -175,7 +174,7 @@ class QuadrupleGenerator {
     generatePrintQuadruple() {
         // Obtener el valor a imprimir
         const valueAddress = this.operandStack.pop();
-        this.typeStack.pop(); // No necesitamos el tipo para print
+        this.typeStack.pop(); // No se necesita el tipo para print
         if (valueAddress === undefined) {
             throw new Error('Error en la generación de cuádruplos: valor faltante para print');
         }
@@ -184,7 +183,7 @@ class QuadrupleGenerator {
         this.quadruples.enqueue(quadruple);
     }
     /**
-     * Genera un cuádruplo GOTO (salto incondicional)
+     * Genera un cuádruplo GOTO
      * @returns Índice del cuádruplo generado
      */
     generateGotoQuadruple() {
@@ -203,7 +202,7 @@ class QuadrupleGenerator {
         if (conditionAddress === undefined || conditionType === undefined) {
             throw new Error('Error en la generación de cuádruplos: condición faltante para GOTOF');
         }
-        // Verificar que la condición sea de tipo entero (booleano)
+        // Verificar que la condición sea de tipo entero
         if (conditionType !== semantic_cube_1.DataType.INT) {
             throw new Error(`Error en la generación de cuádruplos: condición debe ser de tipo entero, no ${conditionType}`);
         }
@@ -213,7 +212,7 @@ class QuadrupleGenerator {
         return this.quadruples.size() - 1;
     }
     /**
-     * Genera un cuádruplo GOTOT (salto si verdadero)
+     * Genera un cuádruplo GOTOT
      * @returns Índice del cuádruplo generado
      */
     generateGototQuadruple() {
@@ -223,7 +222,7 @@ class QuadrupleGenerator {
         if (conditionAddress === undefined || conditionType === undefined) {
             throw new Error('Error en la generación de cuádruplos: condición faltante para GOTOT');
         }
-        // Verificar que la condición sea de tipo entero (booleano)
+        // Verificar que la condición sea de tipo entero
         if (conditionType !== semantic_cube_1.DataType.INT) {
             throw new Error(`Error en la generación de cuádruplos: condición debe ser de tipo entero, no ${conditionType}`);
         }
@@ -260,8 +259,7 @@ class QuadrupleGenerator {
         if (!func) {
             throw new Error(`Error: función '${functionName}' no encontrada`);
         }
-        // Calcular el tamaño del espacio de activación
-        // (número de variables locales + parámetros)
+        // Calcular el tamaño del espacio de activación (número de variables locales + parámetros)
         const localVars = func.variableTable.getAllVariables().length;
         const paramCount = func.parameters.length;
         const activationSize = localVars + paramCount;
@@ -307,8 +305,8 @@ class QuadrupleGenerator {
             this.operandStack.push(returnAddress);
             this.typeStack.push(func.type);
         }
-        // Crear cuádruplo GOSUB con dirección temporal (se resolverá después)
-        const quadruple = (0, quadruple_1.createQuadruple)(quadruple_1.QuadrupleOperator.GOSUB, -1, // Dirección temporal, se resolverá después
+        // Crear cuádruplo GOSUB con dirección temporal que se resolverá después
+        const quadruple = (0, quadruple_1.createQuadruple)(quadruple_1.QuadrupleOperator.GOSUB, -1, // Dirección temporal
         null, returnAddress // Aquí va la dirección donde guardar el resultado
         );
         this.quadruples.enqueue(quadruple);
@@ -401,7 +399,6 @@ class QuadrupleGenerator {
         this.typeStack.clear();
         this.quadruples.clear();
         this.addressMap.clear();
-        this.jumpCounter = 0;
         // Limpiar pilas de funciones
         this.parameterStack.clear();
         this.callStack.clear();

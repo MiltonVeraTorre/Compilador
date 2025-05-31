@@ -1,7 +1,7 @@
 import { babyDuckLexer } from './lexer/lexer';
 import { babyDuckParser } from './parser/parser';
-import { SemanticError, semanticAnalyzer } from './semantic/semantic-analyzer';
 import { Quadruple } from './quadruples';
+import { SemanticError, semanticAnalyzer } from './semantic/semantic-analyzer';
 
 /**
  * Interfaz para el resultado del análisis
@@ -52,5 +52,4 @@ export function parseInput(sourceCode: string): AnalysisResult {
   };
 }
 
-// Exportar el lexer y el parser para acceso directo
 export { babyDuckLexer, babyDuckParser };

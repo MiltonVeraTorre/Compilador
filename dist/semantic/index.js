@@ -1,5 +1,4 @@
 "use strict";
-// Exporto todo desde aqui
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.semanticAnalyzer = exports.SemanticAnalyzer = exports.VariableTable = exports.functionDirectory = exports.FunctionDirectory = exports.semanticCube = exports.Operator = exports.DataType = void 0;
 // Cubo semantico

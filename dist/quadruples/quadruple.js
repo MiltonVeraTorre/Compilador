@@ -2,14 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.resetTempCounter = exports.generateTempVar = exports.quadrupleToString = exports.createQuadruple = exports.QuadrupleOperator = void 0;
 const virtual_memory_1 = require("../memory/virtual-memory");
-/**
- * Operadores adicionales para cuádruplos
- *
- * Extiende los operadores básicos del cubo semántico
- */
 var QuadrupleOperator;
 (function (QuadrupleOperator) {
-    // Operadores heredados del cubo semántico
+    // Operadores del cubo semántico
     QuadrupleOperator["PLUS"] = "+";
     QuadrupleOperator["MINUS"] = "-";
     QuadrupleOperator["MULTIPLY"] = "*";
@@ -72,10 +67,9 @@ function generateTempVar(type) {
 exports.generateTempVar = generateTempVar;
 /**
  * Reinicia el contador de temporales
- * (Ahora se maneja en la memoria virtual)
  */
 function resetTempCounter() {
-    // La memoria virtual se encarga de esto ahora
+    // La memoria virtual se encarga de esto
     virtual_memory_1.virtualMemory.reset();
 }
 exports.resetTempCounter = resetTempCounter;

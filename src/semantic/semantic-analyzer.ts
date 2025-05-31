@@ -569,7 +569,7 @@ export class SemanticAnalyzer {
       return;
     }
 
-    // PRIMERO: Procesar argumentos (evaluar expresiones ANTES de crear el contexto)
+    // Procesar argumentos evaluar expresiones antes de crear el contexto
     if (fCallNode.children.argList && fCallNode.children.argList.length > 0) {
       this.processArgList(fCallNode.children.argList[0], func.parameters);
     } else if (func.parameters.length > 0) {
@@ -580,15 +580,15 @@ export class SemanticAnalyzer {
       return;
     }
 
-    // SEGUNDO: Generar cuádruplo ERA (Espacio de Activación)
+    // Generar cuádruplo ERA
     quadrupleGenerator.generateEraQuadruple(funcName);
 
-    // TERCERO: Generar cuádruplos PARAM (los valores ya están evaluados)
+    // Generar cuádruplos PARAM con los valores ya evaluados
     if (fCallNode.children.argList && fCallNode.children.argList.length > 0) {
       this.generateParamQuadruples(func.parameters.length);
     }
 
-    // CUARTO: Generar cuádruplo GOSUB (llamada a la función)
+    // Generar cuádruplo GOSUB
     quadrupleGenerator.generateGosubQuadruple(funcName);
   }
 
@@ -601,7 +601,7 @@ export class SemanticAnalyzer {
     this.processExpression(conditionNode.children.expression[0]);
     const conditionType = this.currentType;
 
-    // Verificar que la condición sea de tipo entero (booleano)
+    // Verificar que la condición sea de tipo entero
     if (conditionType !== DataType.INT) {
       this.addError(
         `La condición debe ser de tipo entero (booleano), no ${conditionType}`,
@@ -609,7 +609,7 @@ export class SemanticAnalyzer {
       );
     }
 
-    // Generar el cuádruplo GOTOF (salto si falso)
+    // Generar el cuádruplo GOTOF
     const gotofIndex = quadrupleGenerator.generateGotofQuadruple();
 
     // Procesar el cuerpo del if
@@ -646,7 +646,7 @@ export class SemanticAnalyzer {
     this.processExpression(cycleNode.children.expression[0]);
     const conditionType = this.currentType;
 
-    // Verificar que la condición sea de tipo entero (booleano)
+    // Verificar que la condición sea de tipo entero
     if (conditionType !== DataType.INT) {
       this.addError(
         `La condición debe ser de tipo entero (booleano), no ${conditionType}`,
@@ -654,7 +654,7 @@ export class SemanticAnalyzer {
       );
     }
 
-    // Generar el cuádruplo GOTOF (salto si falso)
+    // Generar el cuádruplo GOTOF
     const gotofIndex = quadrupleGenerator.generateGotofQuadruple();
 
     // Procesar el cuerpo del ciclo
@@ -669,7 +669,7 @@ export class SemanticAnalyzer {
   }
 
   /**
-   * Procesa un cuerpo (bloque de código)
+   * Procesa un cuerpo
    * @param bodyNode Nodo de cuerpo
    */
   public processBody(bodyNode: BodyCstNode) {
@@ -763,7 +763,7 @@ export class SemanticAnalyzer {
       return;
     }
 
-    // Verificar tipo de cada argumento (solo evaluar expresiones)
+    // Verificar tipo de cada argumento
     for (let i = 0; i < expressions.length; i++) {
       this.processExpression(expressions[i]);
       const argType = this.currentType;
@@ -787,7 +787,6 @@ export class SemanticAnalyzer {
           expressions[i]
         );
       }
-      // NO generar cuádruplos PARAM aquí - se harán después del ERA
     }
   }
 
@@ -796,7 +795,7 @@ export class SemanticAnalyzer {
    * @param paramCount Número de parámetros
    */
   public generateParamQuadruples(paramCount: number) {
-    // Generar cuádruplos PARAM en orden inverso (porque están en la pila)
+    // Generar cuádruplos PARAM en orden inverso porque están en la pila
     for (let i = paramCount - 1; i >= 0; i--) {
       quadrupleGenerator.generateParamQuadruple(i);
     }
@@ -839,5 +838,4 @@ export class SemanticAnalyzer {
   }
 }
 
-// Exportar un singleton
 export const semanticAnalyzer = new SemanticAnalyzer();
