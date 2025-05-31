@@ -18,9 +18,7 @@ export enum QuadrupleOperator {
   LESS_EQUALS = '<=',
   EQUALS = '==',
   NOT_EQUALS = '!=',
-  AND = '&&',
-  OR = '||',
-  NOT = '!',
+
   ASSIGN = '=',
 
   // Operadores adicionales para cuádruplos

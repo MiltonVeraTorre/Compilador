@@ -20,9 +20,6 @@ var QuadrupleOperator;
     QuadrupleOperator["LESS_EQUALS"] = "<=";
     QuadrupleOperator["EQUALS"] = "==";
     QuadrupleOperator["NOT_EQUALS"] = "!=";
-    QuadrupleOperator["AND"] = "&&";
-    QuadrupleOperator["OR"] = "||";
-    QuadrupleOperator["NOT"] = "!";
     QuadrupleOperator["ASSIGN"] = "=";
     // Operadores adicionales para cuádruplos
     QuadrupleOperator["PRINT"] = "print";

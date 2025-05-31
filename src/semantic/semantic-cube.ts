@@ -27,10 +27,7 @@ export enum Operator {
   EQUALS = '==',
   NOT_EQUALS = '!=',
 
-  // Logicos
-  AND = '&&',
-  OR = '||',
-  NOT = '!',
+
 
   // Asignacion
   ASSIGN = '='
@@ -61,7 +58,7 @@ export class SemanticCube {
     this.setCubeValue(DataType.INT, Operator.MINUS, DataType.INT, DataType.INT);
     // int * int = int
     this.setCubeValue(DataType.INT, Operator.MULTIPLY, DataType.INT, DataType.INT);
-    // int / int = float (división siempre produce float)
+    // int / int = float
     this.setCubeValue(DataType.INT, Operator.DIVIDE, DataType.INT, DataType.FLOAT);
 
     // int + float = float
@@ -147,26 +144,16 @@ export class SemanticCube {
 
     // Operaciones de asignación: =
 
-    // int = int (válido)
+    // int = int
     this.setCubeValue(DataType.INT, Operator.ASSIGN, DataType.INT, DataType.INT);
-    // int = float (inválido - pérdida de precisión)
+    // int = float
     this.setCubeValue(DataType.INT, Operator.ASSIGN, DataType.FLOAT, DataType.ERROR);
-    // float = int (válido - promoción implícita)
+    // float = int
     this.setCubeValue(DataType.FLOAT, Operator.ASSIGN, DataType.INT, DataType.FLOAT);
-    // float = float (válido)
+    // float = float
     this.setCubeValue(DataType.FLOAT, Operator.ASSIGN, DataType.FLOAT, DataType.FLOAT);
 
-    // Operaciones lógicas: &&, ||, !
 
-    // int && int = int (representando booleano)
-    this.setCubeValue(DataType.INT, Operator.AND, DataType.INT, DataType.INT);
-    // int || int = int (representando booleano)
-    this.setCubeValue(DataType.INT, Operator.OR, DataType.INT, DataType.INT);
-
-    // Operaciones unarias (NOT)
-    // !int = int (representando booleano)
-    // Nota: Para operadores unarios, usamos el mismo tipo como operando izquierdo y derecho
-    this.setCubeValue(DataType.INT, Operator.NOT, DataType.INT, DataType.INT);
   }
 
   /**

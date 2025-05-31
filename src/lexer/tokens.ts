@@ -34,9 +34,7 @@ export const NotEquals = createToken({ name: "NotEquals", pattern: /!=/ });
 export const GreaterEquals = createToken({ name: "GreaterEquals", pattern: />=/ });
 export const LessEquals = createToken({ name: "LessEquals", pattern: /<=/ });
 export const EqualsEquals = createToken({ name: "EqualsEquals", pattern: /==/ });
-export const And = createToken({ name: "And", pattern: /&&/ });
-export const Or = createToken({ name: "Or", pattern: /\|\|/ });
-export const Not = createToken({ name: "Not", pattern: /!/ });
+
 export const Plus = createToken({ name: "Plus", pattern: /\+/ });
 export const Minus = createToken({ name: "Minus", pattern: /-/ });
 export const Multiply = createToken({ name: "Multiply", pattern: /\*/ });
@@ -105,12 +103,9 @@ export const allTokens = [
   GreaterEquals,
   LessEquals,
   NotEquals,
-  And,
-  Or,
   Equals,
   GreaterThan,
   LessThan,
-  Not,
   Plus,
   Minus,
   Multiply,

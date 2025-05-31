@@ -128,21 +128,7 @@ export class VirtualMachine {
         this.executeRelational(quad, (a, b) => a === b ? 1 : 0);
         break;
 
-      // Operaciones lógicas
-      case Operator.AND:
-      case QuadrupleOperator.AND:
-        this.executeLogical(quad, (a, b) => (a && b) ? 1 : 0);
-        break;
 
-      case Operator.OR:
-      case QuadrupleOperator.OR:
-        this.executeLogical(quad, (a, b) => (a || b) ? 1 : 0);
-        break;
-
-      case Operator.NOT:
-      case QuadrupleOperator.NOT:
-        this.executeUnary(quad, (a) => (!a || a === 0) ? 1 : 0);
-        break;
 
       // Asignación
       case Operator.ASSIGN:
@@ -404,28 +390,7 @@ export class VirtualMachine {
     return this.output;
   }
 
-  /**
-   * Ejecuta una operación lógica
-   * @param quad Cuádruplo
-   * @param operation Función de operación lógica
-   */
-  private executeLogical(quad: Quadruple, operation: (a: any, b: any) => number): void {
-    const leftValue = this.memory.getValue(quad.leftOperand!);
-    const rightValue = this.memory.getValue(quad.rightOperand!);
-    const result = operation(leftValue, rightValue);
-    this.memory.setValue(quad.result!, result);
-  }
 
-  /**
-   * Ejecuta una operación unaria
-   * @param quad Cuádruplo
-   * @param operation Función de operación unaria
-   */
-  private executeUnary(quad: Quadruple, operation: (a: any) => number): void {
-    const value = this.memory.getValue(quad.leftOperand!);
-    const result = operation(value);
-    this.memory.setValue(quad.result!, result);
-  }
 
   /**
    * Ejecuta una operación de lectura (READ)

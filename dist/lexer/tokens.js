@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.allTokens = exports.Identifier = exports.Comment = exports.WhiteSpace = exports.CteString = exports.CteInt = exports.CteFloat = exports.Divide = exports.Multiply = exports.Minus = exports.Plus = exports.Not = exports.Or = exports.And = exports.EqualsEquals = exports.LessEquals = exports.GreaterEquals = exports.NotEquals = exports.LessThan = exports.GreaterThan = exports.Equals = exports.Comma = exports.Colon = exports.SemiColon = exports.RBracket = exports.LBracket = exports.RParen = exports.LParen = exports.RBrace = exports.LBrace = exports.Read = exports.Print = exports.Do = exports.Else = exports.If = exports.While = exports.Void = exports.Float = exports.Int = exports.Var = exports.End = exports.Main = exports.Program = void 0;
+exports.allTokens = exports.Identifier = exports.Comment = exports.WhiteSpace = exports.CteString = exports.CteInt = exports.CteFloat = exports.Divide = exports.Multiply = exports.Minus = exports.Plus = exports.EqualsEquals = exports.LessEquals = exports.GreaterEquals = exports.NotEquals = exports.LessThan = exports.GreaterThan = exports.Equals = exports.Comma = exports.Colon = exports.SemiColon = exports.RBracket = exports.LBracket = exports.RParen = exports.LParen = exports.RBrace = exports.LBrace = exports.Read = exports.Print = exports.Do = exports.Else = exports.If = exports.While = exports.Void = exports.Float = exports.Int = exports.Var = exports.End = exports.Main = exports.Program = void 0;
 const chevrotain_1 = require("chevrotain");
 // === TOKENS DEL LENGUAJE BABYDUCK ===
 // Palabras clave
@@ -34,9 +34,6 @@ exports.NotEquals = (0, chevrotain_1.createToken)({ name: "NotEquals", pattern: 
 exports.GreaterEquals = (0, chevrotain_1.createToken)({ name: "GreaterEquals", pattern: />=/ });
 exports.LessEquals = (0, chevrotain_1.createToken)({ name: "LessEquals", pattern: /<=/ });
 exports.EqualsEquals = (0, chevrotain_1.createToken)({ name: "EqualsEquals", pattern: /==/ });
-exports.And = (0, chevrotain_1.createToken)({ name: "And", pattern: /&&/ });
-exports.Or = (0, chevrotain_1.createToken)({ name: "Or", pattern: /\|\|/ });
-exports.Not = (0, chevrotain_1.createToken)({ name: "Not", pattern: /!/ });
 exports.Plus = (0, chevrotain_1.createToken)({ name: "Plus", pattern: /\+/ });
 exports.Minus = (0, chevrotain_1.createToken)({ name: "Minus", pattern: /-/ });
 exports.Multiply = (0, chevrotain_1.createToken)({ name: "Multiply", pattern: /\*/ });
@@ -98,12 +95,9 @@ exports.allTokens = [
     exports.GreaterEquals,
     exports.LessEquals,
     exports.NotEquals,
-    exports.And,
-    exports.Or,
     exports.Equals,
     exports.GreaterThan,
     exports.LessThan,
-    exports.Not,
     exports.Plus,
     exports.Minus,
     exports.Multiply,

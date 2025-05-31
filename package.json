@@ -6,8 +6,8 @@
   "scripts": {
     "test": "jest",
     "build": "tsc",
-    "start": "ts-node src/index.ts",
-    "dev": "ts-node-dev --respawn src/index.ts"
+    "start": "ts-node src/compiler.ts",
+    "dev": "ts-node-dev --respawn src/compiler.ts"
   },
   "keywords": [],
   "author": "",

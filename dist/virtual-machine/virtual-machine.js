@@ -106,19 +106,6 @@ class VirtualMachine {
             case quadruple_1.QuadrupleOperator.EQUALS:
                 this.executeRelational(quad, (a, b) => a === b ? 1 : 0);
                 break;
-            // Operaciones lógicas
-            case semantic_cube_1.Operator.AND:
-            case quadruple_1.QuadrupleOperator.AND:
-                this.executeLogical(quad, (a, b) => (a && b) ? 1 : 0);
-                break;
-            case semantic_cube_1.Operator.OR:
-            case quadruple_1.QuadrupleOperator.OR:
-                this.executeLogical(quad, (a, b) => (a || b) ? 1 : 0);
-                break;
-            case semantic_cube_1.Operator.NOT:
-            case quadruple_1.QuadrupleOperator.NOT:
-                this.executeUnary(quad, (a) => (!a || a === 0) ? 1 : 0);
-                break;
             // Asignación
             case semantic_cube_1.Operator.ASSIGN:
             case quadruple_1.QuadrupleOperator.ASSIGN:
@@ -345,27 +332,6 @@ class VirtualMachine {
      */
     getOutput() {
         return this.output;
-    }
-    /**
-     * Ejecuta una operación lógica
-     * @param quad Cuádruplo
-     * @param operation Función de operación lógica
-     */
-    executeLogical(quad, operation) {
-        const leftValue = this.memory.getValue(quad.leftOperand);
-        const rightValue = this.memory.getValue(quad.rightOperand);
-        const result = operation(leftValue, rightValue);
-        this.memory.setValue(quad.result, result);
-    }
-    /**
-     * Ejecuta una operación unaria
-     * @param quad Cuádruplo
-     * @param operation Función de operación unaria
-     */
-    executeUnary(quad, operation) {
-        const value = this.memory.getValue(quad.leftOperand);
-        const result = operation(value);
-        this.memory.setValue(quad.result, result);
     }
     /**
      * Ejecuta una operación de lectura (READ)
