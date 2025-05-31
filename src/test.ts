@@ -51,15 +51,25 @@ if (result.lexErrors.length > 0 || result.parseErrors.length > 0) {
   console.error('Semantic errors:', result.semanticErrors);
 } else {
   console.log('¡Compilación exitosa!');
-  
+
+  // Mostrar los cuádruplos generados
+  console.log('\n=== CUÁDRUPLOS GENERADOS ===');
+  result.quadruples.forEach((quad, index) => {
+    console.log(`${index}: ${quad.operator} | ${quad.leftOperand} | ${quad.rightOperand} | ${quad.result}`);
+  });
+
   // Ejecutar el código usando la máquina virtual
   const vm = new VirtualMachine();
   vm.loadQuadruples(result.quadruples);
-  const output = vm.execute();
 
+  console.log('\n=== ESTADO INICIAL DE MEMORIA ===');
   console.log(vm.getMemoryDebugInfo());
 
-  
-  console.log('Resultado de la ejecución:');
+  const output = vm.execute();
+
+  console.log('\n=== ESTADO FINAL DE MEMORIA ===');
+  console.log(vm.getMemoryDebugInfo());
+
+  console.log('\n=== RESULTADO DE LA EJECUCIÓN ===');
   console.log(output);
 }

@@ -202,6 +202,43 @@ export class VirtualMemory {
   }
 
   /**
+   * Obtiene todas las constantes registradas
+   * @returns Mapa de constantes con sus direcciones
+   */
+  public getConstants(): Map<string, number> {
+    return new Map(this.constantMap);
+  }
+
+  /**
+   * Obtiene las constantes como un array de objetos con valor, tipo y dirección
+   * @returns Array de constantes
+   */
+  public getConstantsArray(): Array<{ value: string | number, type: DataType, address: number }> {
+    const constants: Array<{ value: string | number, type: DataType, address: number }> = [];
+
+    for (const [key, address] of this.constantMap) {
+      const [typeStr, value] = key.split(':');
+      const type = typeStr as DataType;
+
+      // Convertir el valor al tipo apropiado
+      let convertedValue: string | number = value;
+      if (type === DataType.INT) {
+        convertedValue = parseInt(value, 10);
+      } else if (type === DataType.FLOAT) {
+        convertedValue = parseFloat(value);
+      }
+
+      constants.push({
+        value: convertedValue,
+        type,
+        address
+      });
+    }
+
+    return constants;
+  }
+
+  /**
    * Reinicia los contadores de memoria
    */
   public reset(): void {

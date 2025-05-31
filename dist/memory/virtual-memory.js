@@ -168,6 +168,38 @@ class VirtualMemory {
         throw new Error(`Dirección inválida: ${address}`);
     }
     /**
+     * Obtiene todas las constantes registradas
+     * @returns Mapa de constantes con sus direcciones
+     */
+    getConstants() {
+        return new Map(this.constantMap);
+    }
+    /**
+     * Obtiene las constantes como un array de objetos con valor, tipo y dirección
+     * @returns Array de constantes
+     */
+    getConstantsArray() {
+        const constants = [];
+        for (const [key, address] of this.constantMap) {
+            const [typeStr, value] = key.split(':');
+            const type = typeStr;
+            // Convertir el valor al tipo apropiado
+            let convertedValue = value;
+            if (type === semantic_cube_1.DataType.INT) {
+                convertedValue = parseInt(value, 10);
+            }
+            else if (type === semantic_cube_1.DataType.FLOAT) {
+                convertedValue = parseFloat(value);
+            }
+            constants.push({
+                value: convertedValue,
+                type,
+                address
+            });
+        }
+        return constants;
+    }
+    /**
      * Reinicia los contadores de memoria
      */
     reset() {

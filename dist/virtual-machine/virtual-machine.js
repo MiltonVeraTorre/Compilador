@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VirtualMachine = void 0;
+const virtual_memory_1 = require("../memory/virtual-memory");
 const quadruple_1 = require("../quadruples/quadruple");
 const semantic_cube_1 = require("../semantic/semantic-cube");
 const execution_memory_1 = require("./execution-memory");
@@ -34,12 +35,23 @@ class VirtualMachine {
     execute() {
         this.running = true;
         this.instructionPointer = 0;
+        // Inicializar las constantes en la memoria antes de ejecutar
+        this.initializeConstants();
         while (this.running && this.instructionPointer < this.quadruples.length) {
             const quad = this.quadruples[this.instructionPointer];
             this.executeQuadruple(quad);
             this.instructionPointer++;
         }
         return this.output;
+    }
+    /**
+     * Inicializa las constantes en la memoria de ejecución
+     */
+    initializeConstants() {
+        const constants = virtual_memory_1.virtualMemory.getConstantsArray();
+        for (const constant of constants) {
+            this.memory.initializeConstant(constant.address, constant.value, constant.type);
+        }
     }
     /**
      * Ejecuta un cuádruplo individual

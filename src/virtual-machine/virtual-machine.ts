@@ -1,7 +1,7 @@
-import { Quadruple, QuadrupleOperator } from '../quadruples/quadruple';
-import { Operator, DataType } from '../semantic/semantic-cube';
-import { ExecutionMemory, executionMemory } from './execution-memory';
 import { virtualMemory } from '../memory/virtual-memory';
+import { Quadruple, QuadrupleOperator } from '../quadruples/quadruple';
+import { Operator } from '../semantic/semantic-cube';
+import { ExecutionMemory, executionMemory } from './execution-memory';
 
 /**
  * Máquina Virtual de BabyDuck
@@ -42,6 +42,9 @@ export class VirtualMachine {
     this.running = true;
     this.instructionPointer = 0;
 
+    // Inicializar las constantes en la memoria antes de ejecutar
+    this.initializeConstants();
+
     while (this.running && this.instructionPointer < this.quadruples.length) {
       const quad = this.quadruples[this.instructionPointer];
       this.executeQuadruple(quad);
@@ -49,6 +52,17 @@ export class VirtualMachine {
     }
 
     return this.output;
+  }
+
+  /**
+   * Inicializa las constantes en la memoria de ejecución
+   */
+  private initializeConstants(): void {
+    const constants = virtualMemory.getConstantsArray();
+
+    for (const constant of constants) {
+      this.memory.initializeConstant(constant.address, constant.value, constant.type);
+    }
   }
 
   /**
