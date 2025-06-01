@@ -1,34 +1,45 @@
-program whil3_main;
+program llamada_recursiva;
 var
-  contador: int;
-  suma: int;
-  limite: int;
+  numero: int;
+
+void contar_regresivo(n: int) [
+  {
+    print("Contando:");
+    print(n);
+    
+    if (n > 0) {
+      contar_regresivo(n - 1);
+    };
+    
+    print(n);
+  }
+];
+
+void potencia(base: int, exponente: int) [
+  var
+    resultado: int;
+    contador: int;
+  {
+    resultado = 1;
+    contador = 0;
+    
+    while (contador < exponente) do {
+      resultado = resultado * base;
+      contador = contador + 1;
+    };
+    
+    print("Resultado de potencia:");
+    print(resultado);
+    contar_regresivo(resultado);
+  }
+];
 
 main {
-  contador = 1;
-  suma = 0;
-  limite = 10;
+  numero = 5;
+
+  print("Calculando 2^4:");
+  potencia(2, 4);
   
-  print("Sumando numeros del 1 al 10:");
-  
-  while (contador <= limite) do {
-    print("Sumando:");
-    print(contador);
-    suma = suma + contador;
-    contador = contador + 1;
-  };
-  
-  print("La suma total es:");
-  print(suma);
-  
-  contador = 5;
-  print("Contando hacia atras desde 5:");
-  
-  while (contador > 0) do {
-    print(contador);
-    contador = contador - 1;
-  };
-  
-  print("While en main completado");
+  print("Llamadas recursivas completadas");
 }
 end

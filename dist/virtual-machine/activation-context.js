@@ -61,6 +61,21 @@ class ActivationStack {
         this.stack = [];
     }
     /**
+     * Obtiene información de debug sobre la pila de activación
+     * @returns Información de debug
+     */
+    getDebugInfo() {
+        return this.stack.map((context, index) => ({
+            index,
+            functionName: context.functionName,
+            returnAddress: context.returnAddress,
+            localMemory: Object.fromEntries(context.localMemory),
+            parameterMemory: Object.fromEntries(context.parameterMemory),
+            returnValue: context.returnValue,
+            resultAddress: context.resultAddress
+        }));
+    }
+    /**
      * Establece un valor en la memoria local del contexto actual
      * @param address Dirección de memoria
      * @param value Valor a establecer
@@ -83,6 +98,22 @@ class ActivationStack {
         const context = this.getCurrentContext();
         if (context) {
             return context.localMemory.get(address);
+        }
+        return undefined;
+    }
+    /**
+     * Busca un valor en la memoria local de cualquier contexto en la pila
+     * @param address Dirección de memoria
+     * @returns El valor almacenado o undefined si no existe en ningún contexto
+     */
+    getLocalValueFromAnyContext(address) {
+        // Buscar desde el contexto más reciente hacia atrás
+        for (let i = this.stack.length - 1; i >= 0; i--) {
+            const context = this.stack[i];
+            const value = context.localMemory.get(address);
+            if (value !== undefined) {
+                return value;
+            }
         }
         return undefined;
     }

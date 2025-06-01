@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.compileAndRun = void 0;
+exports.compileAndRun = compileAndRun;
 const fs_1 = __importDefault(require("fs"));
 const index_1 = require("./index");
 const virtual_machine_1 = require("./virtual-machine");
@@ -50,7 +50,6 @@ function compileAndRun(sourceCode) {
         };
     }
 }
-exports.compileAndRun = compileAndRun;
 // Leemos el archivo input.txt y corremos el programa con node
 if (require.main === module) {
     const sourceCode = fs_1.default.readFileSync('./input.txt', 'utf8');

@@ -223,7 +223,7 @@ class VirtualMachine {
      * Ejecuta la creación de un espacio de activación
      * @param quad Cuádruplo
      */
-    executeEra(quad) {
+    executeEra(_quad) {
         // El tamaño del espacio está en leftOperand no se usa actualmente pero se mantiene para potencialmente optimizar la asignación de memoria
         this.memory.createActivationContext('function', this.instructionPointer + 1);
     }

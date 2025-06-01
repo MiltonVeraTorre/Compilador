@@ -86,7 +86,17 @@ export class ExecutionMemory {
         if (this.activationStack.isEmpty()) {
           return undefined;
         }
-        return this.activationStack.getLocalValue(address);
+        // Intentar obtener el valor del contexto actual
+        let value = this.activationStack.getLocalValue(address);
+
+        // Si no se encuentra en el contexto actual, buscar en contextos anteriores
+        // Esto es una solución temporal para el problema de variables locales
+        // que se usan como argumentos después de cambiar de contexto
+        if (value === undefined) {
+          value = this.activationStack.getLocalValueFromAnyContext(address);
+        }
+
+        return value;
 
       case MemorySegment.PARAMETER:
         // Si no hay contexto de activación, retornar undefined
@@ -254,7 +264,8 @@ export class ExecutionMemory {
       activationStackSize: this.activationStack.size(),
       globalMemory: Object.fromEntries(this.globalMemory),
       constantMemory: Object.fromEntries(this.constantMemory),
-      temporalMemory: Object.fromEntries(this.temporalMemory)
+      temporalMemory: Object.fromEntries(this.temporalMemory),
+      activationStack: this.activationStack.getDebugInfo()
     };
   }
 }
